@@ -1,0 +1,92 @@
+[
+ {
+  "data": "2026-11-13",
+  "jogo": "MIL @ ORL",
+  "palpite": "ORL",
+  "confianca": "Alta",
+  "chave": "2026-11-13 MIL @ ORL",
+  "resultado": "MIL 99 x 107 ORL",
+  "vencedor": "ORL",
+  "situacao": "Acertou"
+ },
+ {
+  "data": "2026-11-13",
+  "jogo": "NY @ IND",
+  "palpite": "NY",
+  "confianca": "Alta",
+  "chave": "2026-11-13 NY @ IND",
+  "resultado": "NY 104 x 106 IND",
+  "vencedor": "IND",
+  "situacao": "Errou"
+ },
+ {
+  "data": "2026-11-13",
+  "jogo": "CLE @ MIA",
+  "palpite": "CLE",
+  "confianca": "Média",
+  "chave": "2026-11-13 CLE @ MIA",
+  "resultado": "CLE 121 x 133 MIA",
+  "vencedor": "MIA",
+  "situacao": "Errou"
+ },
+ {
+  "data": "2026-11-13",
+  "jogo": "ATL @ CHI",
+  "palpite": "ATL",
+  "confianca": "Média-alta",
+  "chave": "2026-11-13 ATL @ CHI",
+  "resultado": "ATL 117 x 125 CHI",
+  "vencedor": "CHI",
+  "situacao": "Errou"
+ },
+ {
+  "data": "2026-11-13",
+  "jogo": "MEM @ NO",
+  "palpite": "NO",
+  "confianca": "Baixa",
+  "chave": "2026-11-13 MEM @ NO",
+  "resultado": "MEM 142 x 111 NO",
+  "vencedor": "MEM",
+  "situacao": "Errou"
+ },
+ {
+  "data": "2026-11-13",
+  "jogo": "UTAH @ HOU",
+  "palpite": "HOU",
+  "confianca": "Alta",
+  "chave": "2026-11-13 UTAH @ HOU",
+  "resultado": "UTAH 118 x 125 HOU",
+  "vencedor": "HOU",
+  "situacao": "Acertou"
+ },
+ {
+  "data": "2026-11-13",
+  "jogo": "GS @ SA",
+  "palpite": "SA",
+  "confianca": "Média",
+  "chave": "2026-11-13 GS @ SA",
+  "resultado": "",
+  "vencedor": "",
+  "situacao": "Em aberto"
+ },
+ {
+  "data": "2026-11-13",
+  "jogo": "POR @ SAC",
+  "palpite": "SAC",
+  "confianca": "Baixa",
+  "chave": "2026-11-13 POR @ SAC",
+  "resultado": "",
+  "vencedor": "",
+  "situacao": "Em aberto"
+ },
+ {
+  "data": "2026-11-13",
+  "jogo": "OKC @ LAC",
+  "palpite": "OKC",
+  "confianca": "Alta",
+  "chave": "2026-11-13 OKC @ LAC",
+  "resultado": "",
+  "vencedor": "",
+  "situacao": "Em aberto"
+ }
+]

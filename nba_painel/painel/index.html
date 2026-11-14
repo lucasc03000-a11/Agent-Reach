@@ -1,0 +1,382 @@
+<meta name="dash-one-writer">
+<style>
+  .np { display: flex; flex-direction: column; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+  .np-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+  .np-lede { margin: 0; max-width: 65ch; color: var(--color-fg-muted); }
+  .np-lede b { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+  .np-tabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); }
+  .np-tab { font: inherit; color: var(--color-fg-muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; }
+  .np-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+  .np-tab:focus-visible, .np-card:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+  .np-sec { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+  .np-h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+  .np-note { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); max-width: 75ch; }
+  .np-block { display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+  .np-row { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); align-items: center; }
+  .np-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--cds-gap-md); min-height: 120px; }
+  .np-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+  .np-meta { display: flex; justify-content: space-between; gap: var(--cds-gap-sm); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); letter-spacing: .04em; text-transform: uppercase; }
+  .np-match { display: flex; flex-direction: column; gap: 2px; }
+  .np-team { display: flex; justify-content: space-between; gap: var(--cds-gap-sm); font-size: var(--cds-font-size-heading); }
+  .np-team span:last-child { font-variant-numeric: tabular-nums; }
+  .np-win { font-weight: var(--cds-font-weight-medium); }
+  .np-lose { color: var(--color-fg-muted); }
+  .np-fav { display: flex; justify-content: space-between; align-items: baseline; gap: var(--cds-gap-sm); }
+  .np-fav small { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); letter-spacing: .04em; text-transform: uppercase; }
+  .np-pct { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; line-height: 1; }
+  .np-bar { height: 8px; border-radius: 4px; background: var(--color-border-line); overflow: hidden; }
+  .np-bar i { display: block; height: 100%; border-radius: 4px; }
+  .np-small { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .np-pill { align-self: flex-start; border: 1px solid var(--color-border-line); border-radius: 999px; padding: 1px 10px; font-size: var(--cds-font-size-caption); }
+  .np-ok { color: var(--color-ok); border-color: var(--color-ok); }
+  .np-bad { color: var(--color-bad); border-color: var(--color-bad); }
+  .np-warn { color: var(--color-warn); border-color: var(--color-warn); }
+  .np-big { font-family: var(--font-anthropic-serif); font-size: calc(var(--cds-font-size-title) * 1.4); font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .np-scroll { overflow-x: auto; min-width: 0; }
+  .np-table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  .np-table th { text-align: left; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); letter-spacing: .04em; text-transform: uppercase; }
+  .np-table th, .np-table td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .np-table .np-n { text-align: right; }
+  .np-chart { position: relative; min-height: 340px; }
+  .np-chart svg { display: block; width: 100%; }
+  .np-chart text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); font-family: var(--font-anthropic-sans); }
+  .np-chart .np-lab { fill: var(--color-fg); }
+  .np-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; }
+  .np-cmp { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--cds-gap-xs) var(--cds-gap-md); align-items: center; font-variant-numeric: tabular-nums; min-height: 160px; }
+  .np-cmp .np-l { display: flex; justify-content: flex-end; align-items: center; gap: var(--cds-gap-sm); }
+  .np-cmp .np-r { display: flex; align-items: center; gap: var(--cds-gap-sm); }
+  .np-cmp i { display: block; height: 10px; border-radius: 5px; min-width: 2px; }
+  .np-cmp .np-k { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); text-transform: uppercase; letter-spacing: .04em; text-align: center; }
+  [data-dash-source-state=refreshing] { opacity: .5; }
+</style>
+
+<div class="np">
+  <h1 class="np-title" id="titulo">NBA Power Painel</h1>
+  <p class="np-lede" id="resumo">
+    Hoje há <b data-draw="n-jogos" data-source="resumo_hoje" data-field="jogos" data-row="0">—</b> jogos na rodada.
+    O maior favorito do modelo é <b data-draw="top-fav" data-source="resumo_hoje" data-field="favorito" data-row="0">—</b>,
+    com <b data-draw="top-prob" data-source="resumo_hoje" data-field="prob" data-row="0">—</b>% de chance de vitória.
+    Nos palpites já encerrados, o placar é de <b data-draw="p-acertos" data-source="resumo_palpites" data-field="acertos" data-row="0">—</b> acertos
+    em <b data-draw="p-fechados" data-source="resumo_palpites" data-field="fechados" data-row="0">—</b>.
+  </p>
+
+  <div class="np-tabs" role="tablist" aria-label="Seções do painel">
+    <button class="np-tab" role="tab" data-tab="hoje" aria-selected="true">Hoje</button>
+    <button class="np-tab" role="tab" data-tab="ontem" aria-selected="false">Rodada anterior</button>
+    <button class="np-tab" role="tab" data-tab="times" aria-selected="false">Times</button>
+    <button class="np-tab" role="tab" data-tab="jogadores" aria-selected="false">Jogadores</button>
+  </div>
+
+  <section class="np-sec" id="hoje">
+    <div class="np-block">
+      <h2 class="np-h2" id="hoje-jogos">Quem é favorito hoje</h2>
+      <p class="np-note">A chance de vitória vem do modelo do painel: saldo médio de pontos de cada time na temporada, mais 2,5 pontos para o mandante. O placar esperado usa o ataque de um time contra a defesa do outro. Horários de Brasília. É uma estimativa estatística, não uma garantia.</p>
+      <div class="np-grid" data-draw="cards-hoje" data-source="jogos" id="cards-hoje"></div>
+    </div>
+    <div class="np-block">
+      <h2 class="np-h2" id="hoje-proj">Pontos esperados dos principais jogadores</h2>
+      <p class="np-note">Pontos esperados = média de pontos do jogador na temporada, ajustada pelos pontos que o adversário costuma sofrer em relação à média da liga. Jogadores listados como fora pela ESPN não entram.</p>
+      <div class="np-row">
+        <select class="dash-select" id="filtro-jogo" data-draw="filtro-jogo" aria-label="Jogo" data-source="jogos"></select>
+      </div>
+      <div class="np-scroll">
+        <table class="np-table" data-source="projecoes" data-row-key="chave" id="tabela-proj">
+          <thead><tr>
+            <th data-field="jogador">Jogador</th><th data-field="sigla">Time</th><th data-field="adversario">Contra</th>
+            <th class="np-n" data-field="pts_esperados">Pts esperados</th><th class="np-n" data-field="media_pts">Média pts</th>
+            <th class="np-n" data-field="reb">Reb</th><th class="np-n" data-field="ast">Ast</th><th class="np-n" data-field="jogos">Jogos</th>
+          </tr></thead>
+          <tbody data-draw="linhas-proj"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="np-sec" id="ontem" hidden>
+    <div class="np-block">
+      <h2 class="np-h2" id="ontem-palpites">Como foram os palpites</h2>
+      <div class="np-row">
+        <span class="np-big"><span data-draw="p-acertos" data-source="resumo_palpites" data-field="acertos" data-row="0">—</span> de <span data-draw="p-fechados" data-source="resumo_palpites" data-field="fechados" data-row="0">—</span></span>
+        <span class="np-small">palpites certos nos jogos encerrados · <span data-draw="p-abertos" data-source="resumo_palpites" data-field="abertos" data-row="0">—</span> ainda em aberto</span>
+      </div>
+      <div class="np-grid" data-draw="cards-ontem" data-source="jogos palpites" id="cards-ontem"></div>
+    </div>
+    <div class="np-block">
+      <h2 class="np-h2" id="ontem-cestinhas">Cestinhas da rodada</h2>
+      <p class="np-note">Os 15 maiores pontuadores dos jogos encerrados, com a diferença para a média de pontos de cada um na temporada.</p>
+      <div class="np-scroll">
+        <table class="np-table" data-source="boxscore" data-row-key="chave" id="tabela-box">
+          <thead><tr>
+            <th data-field="jogador">Jogador</th><th data-field="jogo">Jogo</th>
+            <th class="np-n" data-field="pts">Pts</th><th class="np-n" data-field="reb">Reb</th><th class="np-n" data-field="ast">Ast</th>
+            <th class="np-n" data-field="min">Min</th><th class="np-n" data-field="arremessos">Arremessos</th>
+            <th class="np-n" data-field="media_pts">Média pts</th><th class="np-n" data-field="acima_da_media">Vs. média</th>
+          </tr></thead>
+          <tbody data-draw="linhas-box"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="np-sec" id="times" hidden>
+    <div class="np-block">
+      <h2 class="np-h2" id="times-mapa">Ataque e defesa de cada time</h2>
+      <p class="np-note">Pontos feitos e sofridos por jogo. Quanto mais à direita, melhor o ataque; quanto mais acima, melhor a defesa. As linhas tracejadas marcam a média da liga.</p>
+      <div class="np-chart" data-draw="mapa-times" data-source="times" id="mapa-times"></div>
+    </div>
+    <div class="np-block">
+      <h2 class="np-h2" id="times-tabela">Classificação</h2>
+      <div class="np-row">
+        <select class="dash-select" id="filtro-conf" aria-label="Conferência">
+          <option value="">Leste e Oeste</option><option value="Leste">Leste</option><option value="Oeste">Oeste</option>
+        </select>
+      </div>
+      <div class="np-scroll">
+        <table class="np-table" data-source="times" data-row-key="sigla" id="tabela-times">
+          <thead><tr>
+            <th data-field="time">Time</th><th data-field="conferencia">Conf.</th>
+            <th class="np-n" data-field="vitorias">V</th><th class="np-n" data-field="derrotas">D</th>
+            <th class="np-n" data-field="pts_feitos">Pts feitos</th><th class="np-n" data-field="pts_sofridos">Pts sofridos</th>
+            <th class="np-n" data-field="saldo">Saldo</th><th data-field="casa">Casa</th><th data-field="fora">Fora</th>
+            <th data-field="ultimos_10">Últ. 10</th><th data-field="sequencia">Seq.</th>
+          </tr></thead>
+          <tbody data-draw="linhas-times"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="np-sec" id="jogadores" hidden>
+    <div class="np-block">
+      <h2 class="np-h2" id="jog-comparar">Comparar dois jogadores</h2>
+      <div class="np-row">
+        <select class="dash-select" id="cmp-a" data-draw="cmp-a" aria-label="Primeiro jogador" data-source="jogadores"></select>
+        <select class="dash-select" id="cmp-b" data-draw="cmp-b" aria-label="Segundo jogador" data-source="jogadores"></select>
+      </div>
+      <div class="np-cmp" data-draw="comparador" data-source="jogadores" id="comparador"></div>
+    </div>
+    <div class="np-block">
+      <h2 class="np-h2" id="jog-lideres">Líderes da temporada</h2>
+      <p class="np-note">Médias por jogo na temporada regular. Mostra os 40 primeiros no critério escolhido, entre quem disputou pelo menos 3 jogos.</p>
+      <div class="np-row">
+        <select class="dash-select" id="filtro-stat" aria-label="Ordenar por">
+          <option value="pts">Pontos</option><option value="reb">Rebotes</option><option value="ast">Assistências</option>
+          <option value="stl">Roubos de bola</option><option value="blk">Tocos</option>
+        </select>
+        <select class="dash-select" id="filtro-time" data-draw="filtro-time" aria-label="Time" data-source="times"></select>
+      </div>
+      <div class="np-scroll">
+        <table class="np-table" data-source="jogadores" data-row-key="jogador_id" id="tabela-jog">
+          <thead><tr>
+            <th data-field="jogador">Jogador</th><th data-field="sigla">Time</th><th data-field="posicao">Pos.</th>
+            <th class="np-n" data-field="jogos">Jogos</th><th class="np-n" data-field="min">Min</th>
+            <th class="np-n" data-field="pts">Pts</th><th class="np-n" data-field="reb">Reb</th><th class="np-n" data-field="ast">Ast</th>
+            <th class="np-n" data-field="stl">Roubos</th><th class="np-n" data-field="blk">Tocos</th>
+            <th class="np-n" data-field="fg_pct">FG%</th><th class="np-n" data-field="tres_pct">3P%</th>
+          </tr></thead>
+          <tbody data-draw="linhas-jog"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  dash.calc('resumo_hoje', {
+    title: 'Resumo da rodada de hoje',
+    description: 'Número de jogos de hoje e o favorito com maior chance de vitória no modelo.',
+    inputs: ['jogos'],
+    fn: (jogos) => {
+      const hoje = jogos.filter((j) => j.dia === 'hoje');
+      const top = hoje.slice().sort((a, b) => b.prob_favorito - a.prob_favorito)[0];
+      return [{jogos: hoje.length, favorito: top ? top.favorito : '', prob: top ? top.prob_favorito : null}];
+    },
+  });
+  dash.calc('resumo_palpites', {
+    title: 'Placar dos palpites',
+    description: 'Quantos palpites acertaram, entre os jogos já encerrados.',
+    inputs: ['palpites'],
+    fn: (palpites) => {
+      const acertos = palpites.filter((p) => p.situacao === 'Acertou').length;
+      const erros = palpites.filter((p) => p.situacao === 'Errou').length;
+      return [{acertos, erros, fechados: acertos + erros, abertos: palpites.length - acertos - erros}];
+    },
+  });
+</script>
+<script>
+  const np = (window.np = {jogo: '', conf: '', stat: 'pts', time: '', a: '', b: ''});
+  const rows = (id) => { const d = dash.data(id); return d.status === 'ok' ? d.data : null; };
+  const f1 = (v) => (v == null || v === '' ? '—' : Number(v).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}));
+  const txt = (v) => (v == null || v === '' ? '—' : String(v));
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const one = (id, field, fmt) => (node) => { const r = rows(id); node.textContent = r && r[0] && r[0][field] != null && r[0][field] !== '' ? (fmt || txt)(r[0][field]) : '—'; };
+
+  dash.draw('n-jogos', one('resumo_hoje', 'jogos'));
+  dash.draw('top-fav', one('resumo_hoje', 'favorito'));
+  dash.draw('top-prob', one('resumo_hoje', 'prob'));
+  dash.draw('p-acertos', one('resumo_palpites', 'acertos'));
+  dash.draw('p-fechados', one('resumo_palpites', 'fechados'));
+  dash.draw('p-abertos', one('resumo_palpites', 'abertos'));
+
+  // preenche um <tbody>: cols = [campo, formatador, classe]
+  const fill = (tbody, list, key, cols) => {
+    tbody.replaceChildren(...(list || []).map((r) => {
+      const tr = document.createElement('tr');
+      tr.dataset.key = encodeURIComponent(r[key]);
+      cols.forEach(([field, fmt, cls]) => tr.append(el('td', cls, (fmt || txt)(r[field]))));
+      return tr;
+    }));
+  };
+  const N = 'np-n';
+
+  dash.draw('cards-hoje', (box) => {
+    const all = rows('jogos');
+    if (!all) { box.replaceChildren(el('span', 'np-small', dash.data('jogos').status === 'error' ? 'Não carregou' : '—')); return; }
+    const hoje = all.filter((j) => j.dia === 'hoje');
+    if (!hoje.length) { box.replaceChildren(el('span', 'np-small', 'Nenhum jogo na rodada de hoje.')); return; }
+    box.replaceChildren(...hoje.map((j) => {
+      const c = el('div', 'np-card');
+      const meta = el('div', 'np-meta'); meta.append(el('span', '', j.hora_brasilia), el('span', '', j.status)); c.append(meta);
+      const m = el('div', 'np-match');
+      [[j.visitante_nome, j.exp_visitante], [j.mandante_nome, j.exp_mandante]].forEach(([nome, exp]) => {
+        const t = el('div', 'np-team'); t.append(el('span', '', nome), el('span', '', txt(exp))); m.append(t);
+      });
+      c.append(m, el('div', 'np-small', 'Placar esperado · total ' + txt(j.total_modelo)));
+      const fav = el('div', 'np-fav'); const lab = el('span'); lab.append(el('small', '', 'Favorito '), el('b', '', j.favorito));
+      fav.append(lab, el('span', 'np-pct', j.prob_favorito + '%')); c.append(fav);
+      const bar = el('div', 'np-bar'); const fillBar = el('i'); fillBar.style.width = j.prob_favorito + '%'; fillBar.style.background = dash.colors[0]; bar.append(fillBar); c.append(bar);
+      const extra = [];
+      if (j.prob_espn_mandante != null) extra.push('ESPN: ' + j.mandante + ' ' + f1(j.prob_espn_mandante) + '%');
+      if (j.linha_casas) extra.push('Linha: ' + j.linha_casas + (j.total_casas ? ' · total ' + f1(j.total_casas) : ''));
+      if (extra.length) c.append(el('div', 'np-small', extra.join(' · ')));
+      return c;
+    }));
+  });
+
+  dash.draw('filtro-jogo', (sel) => {
+    const all = rows('jogos') || [];
+    sel.replaceChildren(new Option('Todos os jogos de hoje', ''), ...all.filter((j) => j.dia === 'hoje').map((j) => new Option(j.jogo, j.jogo_id)));
+    sel.value = np.jogo;
+    sel.onchange = () => { np.jogo = sel.value; dash.draw('linhas-proj'); };
+  });
+  dash.draw('linhas-proj', (tb) => {
+    const list = (rows('projecoes') || []).filter((p) => !np.jogo || p.jogo_id === np.jogo).sort((a, b) => b.pts_esperados - a.pts_esperados).slice(0, np.jogo ? 10 : 20);
+    fill(tb, list, 'chave', [['jogador'], ['sigla'], ['adversario'], ['pts_esperados', f1, N], ['media_pts', f1, N], ['reb', f1, N], ['ast', f1, N], ['jogos', txt, N]]);
+  });
+
+  dash.draw('cards-ontem', (box) => {
+    const all = rows('jogos'), palp = rows('palpites') || [];
+    if (!all) { box.replaceChildren(el('span', 'np-small', dash.data('jogos').status === 'error' ? 'Não carregou' : '—')); return; }
+    box.replaceChildren(...all.filter((j) => j.dia === 'ontem').map((j) => {
+      const c = el('div', 'np-card');
+      const meta = el('div', 'np-meta'); meta.append(el('span', '', j.status === 'Final' ? 'Final' : j.detalhe || j.status), el('span', '', j.linha_casas ? 'Linha ' + j.linha_casas : '')); c.append(meta);
+      const m = el('div', 'np-match');
+      [[j.visitante, j.visitante_nome, j.pts_visitante], [j.mandante, j.mandante_nome, j.pts_mandante]].forEach(([sig, nome, pts]) => {
+        const t = el('div', 'np-team ' + (j.vencedor ? (j.vencedor === sig ? 'np-win' : 'np-lose') : ''));
+        t.append(el('span', '', nome), el('span', '', txt(pts))); m.append(t);
+      });
+      c.append(m);
+      const p = palp.find((x) => x.jogo === j.jogo && x.data === j.data);
+      if (p) {
+        c.append(el('div', 'np-small', 'Palpite: ' + p.palpite + ' · confiança ' + String(p.confianca).toLowerCase()));
+        c.append(el('span', 'np-pill ' + (p.situacao === 'Acertou' ? 'np-ok' : p.situacao === 'Errou' ? 'np-bad' : 'np-warn'), p.situacao));
+      }
+      return c;
+    }));
+  });
+  dash.draw('linhas-box', (tb) => {
+    const list = (rows('boxscore') || []).slice().sort((a, b) => b.pts - a.pts).slice(0, 15);
+    const sig = (v) => (v == null ? '—' : (v > 0 ? '+' : '') + f1(v));
+    fill(tb, list, 'chave', [['jogador'], ['jogo'], ['pts', txt, N], ['reb', txt, N], ['ast', txt, N], ['min', txt, N], ['arremessos', txt, N], ['media_pts', f1, N], ['acima_da_media', sig, N]]);
+  });
+
+  document.querySelectorAll('#filtro-conf').forEach((s) => s.addEventListener('change', () => { np.conf = s.value; dash.draw('linhas-times'); }));
+  dash.draw('linhas-times', (tb) => {
+    const list = (rows('times') || []).filter((t) => !np.conf || t.conferencia === np.conf);
+    const sig = (v) => (v > 0 ? '+' : '') + f1(v);
+    fill(tb, list, 'sigla', [['time'], ['conferencia'], ['vitorias', txt, N], ['derrotas', txt, N], ['pts_feitos', f1, N], ['pts_sofridos', f1, N], ['saldo', sig, N], ['casa'], ['fora'], ['ultimos_10'], ['sequencia']]);
+  });
+
+  dash.draw('mapa-times', (box) => {
+    const t = rows('times');
+    if (!t) { box.replaceChildren(el('span', 'np-small', dash.data('times').status === 'error' ? 'Não carregou' : '—')); return; }
+    box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = 360, m = {t: 16, r: 28, b: 40, l: 44};
+    const x = d3.scaleLinear().domain(d3.extent(t, (d) => d.pts_feitos)).nice().range([m.l, W - m.r]);
+    const y = d3.scaleLinear().domain(d3.extent(t, (d) => d.pts_sofridos)).nice().range([m.t, H - m.b]); // menos pontos sofridos fica em cima
+    const svg = d3.select(box).append('svg').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+      .attr('aria-label', 'Dispersão dos 30 times: pontos feitos por jogo no eixo horizontal e pontos sofridos por jogo no eixo vertical.');
+    const ax = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(W < 500 ? 4 : 8));
+    const ay = svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(6));
+    [ax, ay].forEach((g) => { g.selectAll('line,path').style('stroke', 'var(--cds-chart-axis)'); g.selectAll('text').style('fill', 'var(--cds-text-secondary)'); });
+    svg.append('text').attr('x', W - m.r).attr('y', H - 6).attr('text-anchor', 'end').text('Pontos feitos por jogo →');
+    svg.append('text').attr('x', m.l + 6).attr('y', m.t + 4).text('↑ Menos pontos sofridos');
+    const mx = d3.mean(t, (d) => d.pts_feitos), my = d3.mean(t, (d) => d.pts_sofridos);
+    svg.append('line').attr('x1', x(mx)).attr('x2', x(mx)).attr('y1', m.t).attr('y2', H - m.b).style('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 4');
+    svg.append('line').attr('y1', y(my)).attr('y2', y(my)).attr('x1', m.l).attr('x2', W - m.r).style('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 4');
+    const tip = el('div', 'np-tip'); tip.hidden = true; box.append(tip);
+    const show = (ev, d) => {
+      tip.replaceChildren(el('b', '', d.time), el('div', '', d.vitorias + '–' + d.derrotas + ' · faz ' + f1(d.pts_feitos) + ' · sofre ' + f1(d.pts_sofridos)));
+      tip.hidden = false;
+      const px = x(d.pts_feitos) * (box.clientWidth / W), py = y(d.pts_sofridos) * (box.clientWidth / W);
+      tip.style.left = Math.min(Math.max(0, px - tip.offsetWidth / 2), box.clientWidth - tip.offsetWidth) + 'px';
+      tip.style.top = Math.max(0, py - tip.offsetHeight - 12) + 'px';
+    };
+    const g = svg.selectAll('g.np-pt').data(t).join('g').attr('class', 'np-pt').attr('transform', (d) => `translate(${x(d.pts_feitos)},${y(d.pts_sofridos)})`)
+      .attr('tabindex', 0).style('cursor', 'pointer')
+      .on('pointerenter focus click', show).on('pointerleave blur', () => { tip.hidden = true; });
+    g.append('circle').attr('r', 12).style('fill', 'transparent');
+    g.append('circle').attr('r', 4).style('fill', dash.colors[0]);
+    g.append('text').attr('class', 'np-lab').attr('y', -8).attr('text-anchor', 'middle').text((d) => d.sigla);
+  });
+
+  const qualif = () => (rows('jogadores') || []).filter((j) => j.jogos >= 3);
+  document.querySelectorAll('#filtro-stat').forEach((s) => s.addEventListener('change', () => { np.stat = s.value; dash.draw('linhas-jog'); }));
+  dash.draw('filtro-time', (sel) => {
+    const t = (rows('times') || []).slice().sort((a, b) => a.time.localeCompare(b.time));
+    sel.replaceChildren(new Option('Todos os times', ''), ...t.map((x) => new Option(x.time, x.time_id)));
+    sel.value = np.time;
+    sel.onchange = () => { np.time = sel.value; dash.draw('linhas-jog'); };
+  });
+  dash.draw('linhas-jog', (tb) => {
+    const list = qualif().filter((j) => !np.time || j.time_id === np.time).sort((a, b) => b[np.stat] - a[np.stat]).slice(0, 40);
+    fill(tb, list, 'jogador_id', [['jogador'], ['sigla'], ['posicao'], ['jogos', txt, N], ['min', f1, N], ['pts', f1, N], ['reb', f1, N], ['ast', f1, N], ['stl', f1, N], ['blk', f1, N], ['fg_pct', f1, N], ['tres_pct', f1, N]]);
+  });
+
+  const picker = (key, idx) => (sel) => {
+    const list = qualif().sort((a, b) => b.pts - a.pts).slice(0, 200);
+    if (!np[key] && list[idx]) np[key] = list[idx].jogador_id;
+    sel.replaceChildren(...list.slice().sort((a, b) => a.jogador.localeCompare(b.jogador)).map((j) => new Option(j.jogador + ' (' + j.sigla + ')', j.jogador_id)));
+    sel.value = np[key];
+    sel.onchange = () => { np[key] = sel.value; dash.draw('comparador'); };
+  };
+  dash.draw('cmp-a', picker('a', 0));
+  dash.draw('cmp-b', picker('b', 1));
+  dash.draw('comparador', (box) => {
+    const all = qualif(), top = all.slice().sort((x, y) => y.pts - x.pts);
+    const a = all.find((j) => j.jogador_id === np.a) || top[0], b = all.find((j) => j.jogador_id === np.b) || top[1];
+    if (!a || !b) { box.replaceChildren(el('span', 'np-small', '—')); return; }
+    const out = [el('b', 'np-l', a.jogador), el('span', 'np-k', ''), el('b', 'np-r', b.jogador)];
+    [['pts', 'Pontos'], ['reb', 'Rebotes'], ['ast', 'Assist.'], ['stl', 'Roubos'], ['blk', 'Tocos'], ['min', 'Minutos'], ['fg_pct', 'FG%'], ['tres_pct', '3P%']].forEach(([k, nome]) => {
+      const max = Math.max(a[k], b[k], 0.1);
+      const l = el('div', 'np-l'), r = el('div', 'np-r');
+      const ba = el('i'), bb = el('i');
+      ba.style.width = (a[k] / max) * 60 + '%'; ba.style.background = dash.colors[0];
+      bb.style.width = (b[k] / max) * 60 + '%'; bb.style.background = dash.colors[1];
+      l.append(el('span', '', f1(a[k])), ba); r.append(bb, el('span', '', f1(b[k])));
+      out.push(l, el('span', 'np-k', nome), r);
+    });
+    box.replaceChildren(...out);
+  });
+
+  // abas
+  const tabs = [...document.querySelectorAll('.np-tab')];
+  const open = (name, link) => {
+    if (!tabs.some((t) => t.dataset.tab === name)) return;
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    document.querySelectorAll('.np-sec').forEach((s) => { s.hidden = s.id !== name; });
+    if (link) dash.setLink(name);
+  };
+  tabs.forEach((t) => t.addEventListener('click', () => open(t.dataset.tab, true)));
+  open((location.hash || '').slice(1) || 'hoje', false);
+</script>
