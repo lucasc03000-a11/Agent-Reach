@@ -5,7 +5,8 @@ Uso:  python3 coletor.py [--ontem AAAAMMDD] [--hoje AAAAMMDD] [--saida PASTA]
 
 Sem argumentos, "hoje" é a data atual no fuso do leste dos EUA e "ontem" o dia
 anterior. Gera em PASTA (padrão: ./data) um JSON por tabela do painel:
-jogos, projecoes, boxscore, times, jogadores, ultimos10, fotos e palpites (este
+jogos, projecoes, boxscore, times, jogadores, ultimos10, fotos, forma, estimativas,
+ultimos_times, confrontos e palpites (este
 último confere os palpites guardados em palpites_registrados.json contra os
 resultados). Só usa a biblioteca padrão do Python; as fotos precisam do Pillow
 (sem ele, a tabela de fotos sai vazia).
@@ -78,6 +79,32 @@ def ultimos_jogos(atleta, n=10):
                     "tres": st.get("threePointFieldGoalsMade-threePointFieldGoalsAttempted") or "",
                 })
     return sorted(linhas, key=lambda x: x["data"], reverse=True)[:n]
+
+
+def jogos_do_time(time_id, temporada=None):
+    """Jogos encerrados de um time na temporada regular, do mais antigo ao mais recente."""
+    url = f"{SITE}/teams/{time_id}/schedule?seasontype=2" + (f"&season={temporada}" if temporada else "")
+    try:
+        d = baixar(url)
+    except Exception:
+        return []
+    ano = ((d.get("requestedSeason") or d.get("season") or {}).get("year"))
+    pts = lambda c: int(num(c["score"]["value"] if isinstance(c.get("score"), dict) else c.get("score"), 0))
+    linhas = []
+    for e in d.get("events") or []:
+        comp = e["competitions"][0]
+        if comp["status"]["type"]["state"] != "post":
+            continue
+        eu = [c for c in comp["competitors"] if c["team"]["id"] == time_id][0]
+        adv = [c for c in comp["competitors"] if c["team"]["id"] != time_id][0]
+        linhas.append({"data": e["date"][:10], "adversario_id": adv["team"]["id"],
+                       "adversario": adv["team"]["abbreviation"], "local": "casa" if eu["homeAway"] == "home" else "fora",
+                       "pts": pts(eu), "pts_sofridos": pts(adv), "ano": ano})
+    return sorted(linhas, key=lambda x: x["data"])
+
+
+def media_de(valores):
+    return round(sum(valores) / len(valores), 1) if valores else None
 
 
 def baixar(url):
@@ -159,6 +186,7 @@ def coletar(ontem, hoje):
     atletas = jogadores()
     media = {a["jogador_id"]: a for a in atletas}
     jogos, projecoes, boxscore = [], [], []
+    forma, estimativas, ultimos_times, confrontos = [], [], [], []
 
     for dia, rotulo in ((ontem, "ontem"), (hoje, "hoje")):
         placar = baixar(f"{SITE}/scoreboard?dates={dia}")
@@ -205,6 +233,58 @@ def coletar(ontem, hoje):
                 for les in bloco.get("injuries") or []:
                     if (les.get("status") or "").lower() == "out":
                         fora_de_combate.add(str((les.get("athlete") or {}).get("id")))
+
+            if estado == "pre":  # pontos por jogo: temporada x últimos jogos x adversário
+                rec = {}
+                for t, adv, local in ((fora, casa, "fora"), (casa, fora, "casa")):
+                    g = jogos_do_time(t["time_id"])
+                    no_local = [x for x in g if x["local"] == local]
+                    rec[t["sigla"]] = r = {
+                        "pf": media_de([x["pts"] for x in g]), "pa": media_de([x["pts_sofridos"] for x in g]),
+                        "pf10": media_de([x["pts"] for x in g[-10:]]), "pa10": media_de([x["pts_sofridos"] for x in g[-10:]]),
+                        "pf5": media_de([x["pts"] for x in g[-5:]]), "pa5": media_de([x["pts_sofridos"] for x in g[-5:]]),
+                    }
+                    forma.append({
+                        "chave": f"{ev['id']}-{t['sigla']}", "jogo_id": ev["id"], "sigla": t["sigla"], "time": t["time"],
+                        "local_hoje": local, "jogos": len(g),
+                        "feitos_temporada": r["pf"], "feitos_ult10": r["pf10"], "feitos_ult5": r["pf5"],
+                        "sofridos_temporada": r["pa"], "sofridos_ult10": r["pa10"], "sofridos_ult5": r["pa5"],
+                        "feitos_no_local": media_de([x["pts"] for x in no_local]),
+                        "sofridos_no_local": media_de([x["pts_sofridos"] for x in no_local]),
+                        "adversario": adv["sigla"],
+                    })
+                    for x in g[-10:]:
+                        ultimos_times.append({
+                            "chave": f"{ev['id']}-{t['sigla']}-{x['data']}", "jogo_id": ev["id"], "sigla": t["sigla"],
+                            "data": x["data"], "adversario": ("vs " if x["local"] == "casa" else "@ ") + x["adversario"],
+                            "pts": x["pts"], "pts_sofridos": x["pts_sofridos"],
+                            "resultado": "V" if x["pts"] > x["pts_sofridos"] else "D",
+                        })
+                    if t is fora:  # confronto direto: temporada atual ou, se não houver, a anterior
+                        direto, temp = [x for x in g if x["adversario_id"] == adv["time_id"]], "Atual"
+                        if not direto and g and g[0].get("ano"):
+                            passada = jogos_do_time(t["time_id"], int(g[0]["ano"]) - 1)
+                            direto, temp = [x for x in passada if x["adversario_id"] == adv["time_id"]], "Passada"
+                        for x in direto:
+                            confrontos.append({
+                                "chave": f"{ev['id']}-{x['data']}", "jogo_id": ev["id"], "temporada": temp,
+                                "data": x["data"], "local": casa["sigla"] if x["local"] == "fora" else fora["sigla"],
+                                "visitante_hoje": fora["sigla"], "pts_visitante_hoje": x["pts"],
+                                "mandante_hoje": casa["sigla"], "pts_mandante_hoje": x["pts_sofridos"],
+                                "vencedor": fora["sigla"] if x["pts"] > x["pts_sofridos"] else casa["sigla"],
+                            })
+                a_, h_ = rec[fora["sigla"]], rec[casa["sigla"]]
+                for ordem, (recorte, k) in enumerate((("Temporada", ""), ("Últimos 10 jogos", "10"), ("Últimos 5 jogos", "5"))):
+                    if None in (a_["pf" + k], a_["pa" + k], h_["pf" + k], h_["pa" + k]):
+                        continue
+                    pv = round((a_["pf" + k] + h_["pa" + k]) / 2, 1)
+                    pm = round((h_["pf" + k] + a_["pa" + k]) / 2, 1)
+                    estimativas.append({
+                        "chave": f"{ev['id']}-{ordem}", "jogo_id": ev["id"], "ordem": ordem, "recorte": recorte,
+                        "visitante": fora["sigla"], "pts_visitante": pv, "mandante": casa["sigla"], "pts_mandante": pm,
+                        "total": round(pv + pm, 1), "favorito": fora["sigla"] if pv > pm else casa["sigla"],
+                        "margem": round(abs(pv - pm), 1),
+                    })
 
             if estado == "pre":  # pontos esperados dos principais jogadores
                 for t, adv in ((fora, casa), (casa, fora)):
@@ -279,7 +359,8 @@ def coletar(ontem, hoje):
             fotos.append({"chave": "time-" + t["sigla"], "foto": logo})
 
     return {"jogos": jogos, "projecoes": projecoes, "boxscore": boxscore,
-            "ultimos10": ultimos10, "fotos": fotos,
+            "ultimos10": ultimos10, "fotos": fotos, "forma": forma, "estimativas": estimativas,
+            "ultimos_times": ultimos_times, "confrontos": confrontos,
             "times": sorted(times.values(), key=lambda t: -t["aproveitamento"]),
             "jogadores": atletas, "palpites": palpites}
 
