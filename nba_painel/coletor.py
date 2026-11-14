@@ -5,10 +5,13 @@ Uso:  python3 coletor.py [--ontem AAAAMMDD] [--hoje AAAAMMDD] [--saida PASTA]
 
 Sem argumentos, "hoje" é a data atual no fuso do leste dos EUA e "ontem" o dia
 anterior. Gera em PASTA (padrão: ./data) um JSON por tabela do painel:
-jogos, projecoes, boxscore, times, jogadores e palpites (este último confere
-os palpites guardados em palpites_registrados.json contra os resultados).
-Só usa a biblioteca padrão do Python.
+jogos, projecoes, boxscore, times, jogadores, ultimos10, fotos e palpites (este
+último confere os palpites guardados em palpites_registrados.json contra os
+resultados). Só usa a biblioteca padrão do Python; as fotos precisam do Pillow
+(sem ele, a tabela de fotos sai vazia).
 """
+import base64
+import io
 import argparse
 import datetime as dt
 import json
@@ -22,9 +25,59 @@ STAND = "https://site.api.espn.com/apis/v2/sports/basketball/nba/standings"
 ATHL = ("https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/"
         "statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=false"
         "&limit=50&sort=offensive.avgPoints%3Adesc&seasontype=2")
+GAMELOG = "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/{}/gamelog"
+FOTO = "https://a.espncdn.com/i/headshots/nba/players/full/{}.png"
 MANDO = 2.5    # vantagem de jogar em casa, em pontos
 DESVIO = 12.0  # desvio-padrão da margem de um jogo da NBA, em pontos
 AQUI = pathlib.Path(__file__).resolve().parent
+
+
+def baixar_bytes(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "nba-painel/1.0"})
+    with urllib.request.urlopen(req, timeout=40) as r:
+        return r.read()
+
+
+def miniatura(url, largura):
+    """Baixa uma imagem e devolve uma miniatura WebP como data: URL ('' se falhar)."""
+    try:
+        from PIL import Image
+        img = Image.open(io.BytesIO(baixar_bytes(url))).convert("RGBA")
+        img = img.resize((largura, round(img.height * largura / img.width)), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, "WEBP", quality=72)
+        return "data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        return ""
+
+
+def ultimos_jogos(atleta, n=10):
+    """Os n jogos mais recentes de um jogador na temporada regular."""
+    try:
+        d = baixar(GAMELOG.format(atleta["jogador_id"]))
+    except Exception:
+        return []
+    nomes, eventos, linhas = d.get("names") or [], d.get("events") or {}, []
+    for tipo in d.get("seasonTypes") or []:
+        if "Regular" not in (tipo.get("displayName") or ""):
+            continue
+        for cat in tipo.get("categories") or []:
+            for e in cat.get("events") or []:
+                ev, st = eventos.get(e["eventId"]), dict(zip(nomes, e.get("stats") or []))
+                if not ev:
+                    continue
+                linhas.append({
+                    "chave": f"{atleta['jogador_id']}-{e['eventId']}", "jogador_id": atleta["jogador_id"],
+                    "jogador": atleta["jogador"], "data": (ev.get("gameDate") or "")[:10],
+                    "adversario": ("@ " if ev.get("atVs") == "@" else "vs ") + (ev.get("opponent") or {}).get("abbreviation", ""),
+                    "resultado": {"W": "V", "L": "D"}.get(ev.get("gameResult"), "") + " " + (ev.get("score") or ""),
+                    "min": int(num(st.get("minutes"), 0)), "pts": int(num(st.get("points"), 0)),
+                    "reb": int(num(st.get("totalRebounds"), 0)), "ast": int(num(st.get("assists"), 0)),
+                    "stl": int(num(st.get("steals"), 0)), "blk": int(num(st.get("blocks"), 0)),
+                    "arremessos": st.get("fieldGoalsMade-fieldGoalsAttempted") or "",
+                    "tres": st.get("threePointFieldGoalsMade-threePointFieldGoalsAttempted") or "",
+                })
+    return sorted(linhas, key=lambda x: x["data"], reverse=True)[:n]
 
 
 def baixar(url):
@@ -52,6 +105,7 @@ def classificacao():
             v, d = int(num(s.get("wins"), 0)), int(num(s.get("losses"), 0))
             times[t["id"]] = {
                 "time_id": t["id"], "sigla": t["abbreviation"], "time": t["displayName"],
+                "logo_url": ((t.get("logos") or [{}])[0]).get("href") or "",
                 "conferencia": nome_conf, "vitorias": v, "derrotas": d,
                 "aproveitamento": round(v / (v + d), 3) if v + d else 0.0,
                 "pts_feitos": num(s.get("avgPointsFor"), 0.0),
@@ -208,7 +262,24 @@ def coletar(ontem, hoje):
         palpites.append(linha)
     arq.write_text(json.dumps(palpites, ensure_ascii=False, indent=1) + "\n")
 
+    # jogadores com ficha completa: os de hoje, os cestinhas de ontem e os 100 maiores pontuadores
+    ids = [p["chave"].split("-")[1] for p in projecoes]
+    ids += [b["chave"].split("-")[1] for b in sorted(boxscore, key=lambda b: -b["pts"])[:20]]
+    ids += [a["jogador_id"] for a in sorted(atletas, key=lambda a: -a["pts"]) if a["jogos"] >= 3][:100]
+    ids = [i for i in dict.fromkeys(ids) if i in media]
+    ultimos10, fotos = [], []
+    for i in ids:
+        ultimos10 += ultimos_jogos(media[i])
+        foto = miniatura(FOTO.format(i), 200)
+        if foto:
+            fotos.append({"chave": i, "foto": foto})
+    for t in times.values():
+        logo = miniatura(t.pop("logo_url"), 72) if t.get("logo_url") else ""
+        if logo:
+            fotos.append({"chave": "time-" + t["sigla"], "foto": logo})
+
     return {"jogos": jogos, "projecoes": projecoes, "boxscore": boxscore,
+            "ultimos10": ultimos10, "fotos": fotos,
             "times": sorted(times.values(), key=lambda t: -t["aproveitamento"]),
             "jogadores": atletas, "palpites": palpites}
 

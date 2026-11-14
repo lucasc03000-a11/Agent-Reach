@@ -65,9 +65,9 @@
   "palpite": "SA",
   "confianca": "Média",
   "chave": "2026-11-13 GS @ SA",
-  "resultado": "",
-  "vencedor": "",
-  "situacao": "Em aberto"
+  "resultado": "GS 85 x 123 SA",
+  "vencedor": "SA",
+  "situacao": "Acertou"
  },
  {
   "data": "2026-11-13",
@@ -75,9 +75,9 @@
   "palpite": "SAC",
   "confianca": "Baixa",
   "chave": "2026-11-13 POR @ SAC",
-  "resultado": "",
-  "vencedor": "",
-  "situacao": "Em aberto"
+  "resultado": "POR 120 x 107 SAC",
+  "vencedor": "POR",
+  "situacao": "Errou"
  },
  {
   "data": "2026-11-13",
@@ -85,8 +85,8 @@
   "palpite": "OKC",
   "confianca": "Alta",
   "chave": "2026-11-13 OKC @ LAC",
-  "resultado": "",
-  "vencedor": "",
-  "situacao": "Em aberto"
+  "resultado": "OKC 112 x 113 LAC",
+  "vencedor": "LAC",
+  "situacao": "Errou"
  }
 ]
