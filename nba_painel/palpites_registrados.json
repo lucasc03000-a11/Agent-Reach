@@ -88,5 +88,55 @@
   "resultado": "OKC 112 x 113 LAC",
   "vencedor": "LAC",
   "situacao": "Errou"
+ },
+ {
+  "data": "2026-11-14",
+  "jogo": "DEN @ NO",
+  "palpite": "DEN",
+  "confianca": "Alta",
+  "chave": "2026-11-14 DEN @ NO",
+  "resultado": "",
+  "vencedor": "",
+  "situacao": "Em aberto"
+ },
+ {
+  "data": "2026-11-14",
+  "jogo": "DAL @ CLE",
+  "palpite": "DAL",
+  "confianca": "Baixa",
+  "chave": "2026-11-14 DAL @ CLE",
+  "resultado": "",
+  "vencedor": "",
+  "situacao": "Em aberto"
+ },
+ {
+  "data": "2026-11-14",
+  "jogo": "DET @ MIA",
+  "palpite": "DET",
+  "confianca": "Média",
+  "chave": "2026-11-14 DET @ MIA",
+  "resultado": "",
+  "vencedor": "",
+  "situacao": "Em aberto"
+ },
+ {
+  "data": "2026-11-14",
+  "jogo": "BKN @ MEM",
+  "palpite": "MEM",
+  "confianca": "Média",
+  "chave": "2026-11-14 BKN @ MEM",
+  "resultado": "",
+  "vencedor": "",
+  "situacao": "Em aberto"
+ },
+ {
+  "data": "2026-11-14",
+  "jogo": "CHI @ MIN",
+  "palpite": "MIN",
+  "confianca": "Alta",
+  "chave": "2026-11-14 CHI @ MIN",
+  "resultado": "",
+  "vencedor": "",
+  "situacao": "Em aberto"
  }
 ]
