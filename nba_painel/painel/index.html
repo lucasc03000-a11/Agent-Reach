@@ -312,7 +312,7 @@
   const N = 'np-n';
 
   // fotos de jogadores e logos de times (data: URLs coletadas da ESPN)
-  let fotoMap = null, fotoSrc = null;
+  let fotoMap = new Map(), fotoSrc = null;
   const foto = (chave) => {
     const r = rows('fotos');
     if (r !== fotoSrc) { fotoSrc = r; fotoMap = new Map((r || []).map((x) => [String(x.chave), x.foto])); }
