@@ -190,7 +190,7 @@
       <p class="np-note">Toque em um jogo para ver o confronto e os jogadores. Horários de Brasília.</p>
     </div>
     <div class="np-block">
-      <div class="np-panel"><div class="np-duel" data-draw="confronto" data-source="jogos fotos" id="confronto"></div></div>
+      <div class="np-panel"><div class="np-duel" data-draw="confronto" data-source="jogos fotos palpites" id="confronto"></div></div>
       <p class="np-note">A chance de vitória vem do modelo do painel: saldo médio de pontos de cada time na temporada, mais 2,5 pontos para o mandante. O placar esperado cruza o ataque de um time com a defesa do outro. É uma estimativa estatística, não uma garantia.</p>
     </div>
     <div class="np-block">
@@ -440,7 +440,10 @@
     const extra = [j.hora_brasilia + ' de Brasília', 'total esperado ' + txt(j.total_modelo)];
     if (j.prob_espn_mandante != null) extra.push('ESPN dá ' + f1(j.prob_espn_mandante) + '% para ' + j.mandante);
     if (j.linha_casas) extra.push('linha ' + j.linha_casas + (j.total_casas ? ', total ' + f1(j.total_casas) : ''));
-    box.replaceChildren(vs, fr, bar, el('div', 'np-small', extra.join(' · ')));
+    const pal = (rows('palpites') || []).find((x) => x.jogo === j.jogo && x.data === j.data);
+    const kids = [vs, fr, bar, el('div', 'np-small', extra.join(' · '))];
+    if (pal) { const r = el('div', 'np-row'); r.append(el('span', 'np-tag', 'Palpite ' + pal.palpite), el('span', 'np-small', 'confiança ' + String(pal.confianca).toLowerCase())); kids.push(r); }
+    box.replaceChildren(...kids);
   });
   const pcard = (id, nome, sigla, ...extra) => {
     const b = el('button', 'np-pcard'); b.type = 'button'; b.setAttribute('aria-label', 'Abrir ficha de ' + nome);
