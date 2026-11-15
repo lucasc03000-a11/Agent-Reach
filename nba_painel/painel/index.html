@@ -38,6 +38,10 @@
   .np-combo { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--np-panel); border: 2px solid var(--np-orange); border-radius: 14px; }
   .np-combo ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
   .np-combo .np-pct { color: var(--np-orange); font-size: 40px; line-height: .9; }
+  .np-gloss { background: var(--np-panel); border: 2px solid var(--np-line); border-radius: 12px; padding: 10px 14px; font-size: 13px; line-height: 1.5; color: var(--np-muted); }
+  .np-gloss summary { cursor: pointer; color: var(--np-fg); font-weight: 700; }
+  .np-gloss ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+  .np-gloss b { color: var(--np-fg); }
   .np-note { margin: 0; color: var(--np-muted); font-size: 13px; line-height: 1.45; max-width: 75ch; }
   .np-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .np select { font: inherit; color: var(--np-fg); background-color: var(--np-panel); border: 2px solid var(--np-line); border-radius: 10px; padding: 7px 10px; max-width: 100%; }
@@ -257,12 +261,22 @@
   <section class="np-sec" id="algoritmo" hidden>
     <div class="np-block">
       <h2 class="np-h2" id="alg-combos">Dupla e tripla do dia</h2>
-      <p class="np-note">O algoritmo parte da linha das casas e escolhe linhas alternativas com folga, uma perna por jogo. Digite a cotação que a sua casa paga pela combinação: ela só vale a pena se for maior que a cotação mínima. Acertar muito não é o mesmo que lucrar; no teste com cotações reais, apostar em favoritos não deu lucro consistente.</p>
+      <p class="np-note">O algoritmo pega o número principal que as casas de apostas publicam para cada jogo (o total de pontos e a vantagem do favorito) e escolhe apostas com margem de segurança em relação a ele, uma por jogo. Digite a cotação que a sua casa paga pela combinação: ela só compensa se for maior que a cotação mínima. Acertar muito não é o mesmo que lucrar; no teste com cotações reais, apostar em favoritos não deu lucro consistente.</p>
+      <details class="np-gloss"><summary>O que significa cada termo</summary>
+        <ul>
+          <li><b>Chance:</b> de cada 100 vezes que uma aposta parecida apareceu no histórico, em quantas ela deu certo.</li>
+          <li><b>Cotação mínima:</b> o menor valor que a casa precisa pagar para a aposta compensar no longo prazo. Se a casa paga menos que isso, a aposta perde dinheiro com o tempo, mesmo acertando bastante.</li>
+          <li><b>Margem de segurança:</b> quantos pontos a aposta fica distante do número principal da casa. Exemplo: a casa prevê 224 pontos no jogo; apostar em "acima de 209,5" dá 15 pontos de margem, porque o jogo pode ficar até 14 pontos abaixo do previsto e a aposta ainda ganha.</li>
+          <li><b>Handicap:</b> pontos somados ou tirados de um time antes de ver quem venceu. "76ers +5,5" ganha se os 76ers vencerem ou perderem por até 5 pontos.</li>
+          <li><b>Total:</b> soma dos pontos dos dois times. "Acima de 209,5" ganha se o jogo tiver 210 pontos ou mais.</li>
+          <li><b>Dupla e tripla:</b> duas ou três apostas no mesmo bilhete. Todas precisam dar certo para o bilhete ganhar.</li>
+        </ul>
+      </details>
       <div class="np-grid" data-draw="alg-combos" data-source="alg_combos" id="cards-combos"></div>
     </div>
     <div class="np-block">
-      <h2 class="np-h2" id="alg-pernas">Pernas com cerca de 80% de chance</h2>
-      <p class="np-note">Todas as linhas com folga que o algoritmo encontrou para os jogos de hoje. Jogos sem linha das casas publicada só têm pernas de 1º quarto e 1º tempo, que usam o modelo de médias e são menos confiáveis. Digite a cotação da casa para ver se a perna vale.</p>
+      <h2 class="np-h2" id="alg-pernas">Apostas com cerca de 80% de chance</h2>
+      <p class="np-note">Todas as apostas com margem de segurança que o algoritmo encontrou para os jogos de hoje. Quando a casa ainda não publicou os números de um jogo, só aparecem apostas de 1º quarto e 1º tempo, que usam as médias dos times e são menos confiáveis. Digite a cotação da casa para ver se a aposta compensa.</p>
       <div class="np-row">
         <select id="alg-jogo" data-draw="alg-jogo" aria-label="Jogo" data-source="alg_pernas"></select>
         <select id="alg-mercado" aria-label="Mercado">
@@ -272,8 +286,8 @@
       <div class="np-scroll">
         <table class="np-table" data-source="alg_pernas" data-row-key="chave" id="tabela-pernas">
           <thead><tr>
-            <th data-field="aposta">Aposta</th><th class="np-n" data-field="cotacao_minima">Mínima</th>
-            <th>Cotação da casa</th><th>Vale?</th>
+            <th data-field="aposta">Aposta</th><th class="np-n" data-field="cotacao_minima">Cotação mínima</th>
+            <th>Cotação da casa</th><th>Compensa?</th>
             <th data-field="jogo">Jogo</th><th class="np-n" data-field="chance">Chance %</th><th data-field="mercado">Mercado</th>
           </tr></thead>
           <tbody data-draw="alg-linhas"></tbody>
@@ -282,12 +296,12 @@
     </div>
     <div class="np-block">
       <h2 class="np-h2" id="alg-teste">Como o algoritmo se saiu no histórico</h2>
-      <p class="np-note">Teste em jogos da temporada passada e da atual. A primeira tabela mostra com que frequência uma linha com folga bateu. A segunda mostra em quantos dias a dupla e a tripla escolhidas pelo algoritmo acertaram, e a cotação mínima que elas precisariam pagar para empatar.</p>
+      <p class="np-note">Teste em jogos da temporada passada e da atual. A primeira tabela mostra quantas vezes a aposta deu certo conforme a margem de segurança. A segunda mostra em quantos dias a dupla e a tripla escolhidas pelo algoritmo deram certo, e a cotação mínima que elas precisariam pagar para não dar prejuízo.</p>
       <div class="np-scroll">
         <table class="np-table" data-source="alg_folga" data-row-key="chave" id="tabela-folga">
           <thead><tr>
-            <th class="np-n" data-field="folga">Folga em pontos</th><th class="np-n" data-field="acerto_total">Total bateu %</th>
-            <th class="np-n" data-field="acerto_handicap">Handicap bateu %</th><th class="np-n" data-field="jogos">Jogos</th>
+            <th class="np-n" data-field="folga">Margem de segurança (pontos)</th><th class="np-n" data-field="acerto_total">Total deu certo %</th>
+            <th class="np-n" data-field="acerto_handicap">Handicap deu certo %</th><th class="np-n" data-field="jogos">Jogos</th>
           </tr></thead>
           <tbody data-draw="alg-folga"></tbody>
         </table>
@@ -295,9 +309,9 @@
       <div class="np-scroll">
         <table class="np-table" data-source="alg_teste" data-row-key="chave" id="tabela-teste">
           <thead><tr>
-            <th class="np-n" data-field="chance_por_perna">Chance por perna %</th>
-            <th class="np-n" data-field="acerto_dupla">Dupla acertou %</th><th class="np-n" data-field="dias_dupla">Dias</th><th class="np-n" data-field="cotacao_minima_dupla">Cotação mínima</th>
-            <th class="np-n" data-field="acerto_tripla">Tripla acertou %</th><th class="np-n" data-field="dias_tripla">Dias</th><th class="np-n" data-field="cotacao_minima_tripla">Cotação mínima</th>
+            <th class="np-n" data-field="chance_por_perna">Chance de cada aposta %</th>
+            <th class="np-n" data-field="acerto_dupla">Dupla deu certo %</th><th class="np-n" data-field="dias_dupla">Dias</th><th class="np-n" data-field="cotacao_minima_dupla">Cotação mínima</th>
+            <th class="np-n" data-field="acerto_tripla">Tripla deu certo %</th><th class="np-n" data-field="dias_tripla">Dias</th><th class="np-n" data-field="cotacao_minima_tripla">Cotação mínima</th>
           </tr></thead>
           <tbody data-draw="alg-teste"></tbody>
         </table>
@@ -627,7 +641,7 @@
   const veredito = (node, chave, minima) => {
     const v = parseFloat(String(np.cot[chave] || '').replace(',', '.'));
     node.className = 'np-tag ' + (!v ? '' : v > minima ? 'np-up' : 'np-down');
-    node.textContent = !v ? 'Digite a cotação' : v > minima ? 'Vale' : 'Não vale';
+    node.textContent = !v ? 'Digite a cotação' : v > minima ? 'Compensa' : 'Não compensa';
     node.hidden = false;
   };
   const campo = (chave, minima, alvo, rotulo) => {
@@ -639,14 +653,14 @@
   dash.draw('alg-combos', (box) => {
     const r = rows('alg_combos');
     if (!r) { wait(box, 'alg_combos'); return; }
-    if (!r.length) { box.replaceChildren(el('span', 'np-small', 'Ainda não há jogos com linha das casas suficientes para montar a dupla e a tripla de hoje.')); return; }
+    if (!r.length) { box.replaceChildren(el('span', 'np-small', 'Ainda não há jogos suficientes com os números das casas publicados para montar a dupla e a tripla de hoje.')); return; }
     box.replaceChildren(...r.map((c) => {
       const card = el('div', 'np-combo'); const top = el('div', 'np-favrow');
       top.append(el('div', 'np-lbl np-disp', c.tipo), el('div', 'np-pct np-disp', c.chance + '%'));
       const ul = el('ul'); String(c.pernas).split(' + ').forEach((t) => ul.append(el('li', '', t)));
       const tag = el('span', 'np-tag'); const row = el('div', 'np-row');
       row.append(campo('combo-' + c.chave, c.cotacao_minima, tag, 'Cotação da casa para a ' + c.tipo), tag);
-      card.append(top, el('div', 'np-small', 'chance estimada de acerto · cotação mínima para valer: ' + c2(c.cotacao_minima)), ul, row);
+      card.append(top, el('div', 'np-small', 'chance estimada de dar certo · cotação mínima para compensar: ' + c2(c.cotacao_minima)), ul, row);
       veredito(tag, 'combo-' + c.chave, c.cotacao_minima);
       return card;
     }));
