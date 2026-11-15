@@ -286,7 +286,79 @@ def hoje(dia=None):
         print("Nenhum jogo por começar nessa data.")
 
 
+def exportar(dia):
+    """Grava em data/ as tabelas do algoritmo para o painel."""
+    import datetime as dt
+    jogos = carregar()
+    mod = passar(jogos)
+    dv = desvios(jogos)
+    req = lambda u: json.load(urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "nba-painel/1.0"}), timeout=40))
+    nomes = {"total": "Total do jogo", "handicap": "Handicap", "vencedor": "Vencedor", "q1": "1º quarto", "t1": "1º tempo"}
+    linhas, cand = [], []
+    for e in req(f"{SITE}/scoreboard?dates={dia}").get("events") or []:
+        if e["status"]["type"]["state"] != "pre":
+            continue
+        lado = {c["homeAway"]: c for c in e["competitions"][0]["competitors"]}
+        v, m = lado["away"]["team"]["abbreviation"], lado["home"]["team"]["abbreviation"]
+        p = mod.prever(v, m)
+        g = {"jogo_id": e["id"], "visitante": v, "mandante": m, "pronto": p["pronto"],
+             "m_margem": p["jogo"][1] - p["jogo"][0], "m_total": sum(p["jogo"]),
+             "m_q1": sum(p["q1"]), "m_t1": sum(p["t1"]), "total_linha": None, "linha_mandante": None}
+        pc = (req(f"{SITE}/summary?event={e['id']}").get("pickcenter") or [{}])[0]
+        if pc.get("overUnder") is not None and pc.get("spread") is not None:
+            g["total_linha"], g["linha_mandante"] = float(pc["overUnder"]), float(pc["spread"])
+        for i, pe in enumerate(sorted(pernas(g, dv), key=lambda x: -x[1])):
+            linhas.append({"chave": f"{e['id']}-{i}", "jogo_id": e["id"], "jogo": f"{v} @ {m}",
+                           "aposta": pe[0].split(": ")[1], "mercado": nomes[pe[3]],
+                           "chance": round(pe[1] * 100), "cotacao_minima": round(1 / pe[1], 2),
+                           "linha_casas": "" if g["total_linha"] is None else f"{m} {g['linha_mandante']:+.1f} · total {g['total_linha']}"})
+            cand.append((e["id"], pe))
+    combos = []
+    base = [(j, pe) for j, pe in cand if pe[3] in ("total", "handicap", "vencedor")]
+    for n, nome in ((2, "Dupla"), (3, "Tripla")):
+        esc = melhores(base, n)
+        if esc:
+            prob = math.prod(pe[1] for _, pe in esc)
+            combos.append({"chave": nome, "tipo": nome, "pernas": " + ".join(pe[0] for _, pe in esc),
+                           "chance": round(prob * 100), "cotacao_minima": round(1 / prob, 2)})
+    com = [g for g in jogos if g["total_linha"] is not None]
+    folga = []
+    for c in (0, 4, 6, 8, 10, 12, 15, 18):
+        t = st.mean([(g["total"] > g["total_linha"] - c) for g in com] + [(g["total"] < g["total_linha"] + c) for g in com])
+        h = st.mean([(g["margem"] + g["linha_mandante"] + c > 0) for g in com] + [(-(g["margem"] + g["linha_mandante"]) + c > 0) for g in com])
+        folga.append({"chave": str(c), "folga": c, "acerto_total": round(t * 100, 1), "acerto_handicap": round(h * 100, 1), "jogos": len(com)})
+    meio = len(jogos) // 2
+    dvt, aval = desvios(jogos[:meio]), jogos[meio:]
+    byid = {x["jogo_id"]: x for x in aval}
+    teste_c = []
+    for alvo in (0.75, 0.80, 0.85, 0.90):
+        dias = defaultdict(list)
+        for g in aval:
+            for pe in pernas(g, dvt, alvo):
+                if pe[3] in ("total", "handicap", "vencedor"):
+                    dias[g["data"]].append((g["jogo_id"], pe))
+        linha = {"chave": str(round(alvo * 100)), "chance_por_perna": round(alvo * 100)}
+        for n, nome in ((2, "dupla"), (3, "tripla")):
+            hits = [all(pe[2](byid[j]) for j, pe in esc) for esc in (melhores(l, n) for l in dias.values()) if esc]
+            linha[f"acerto_{nome}"] = round(st.mean(hits) * 100, 1)
+            linha[f"dias_{nome}"] = len(hits)
+            linha[f"cotacao_minima_{nome}"] = round(1 / st.mean(hits), 2)
+        teste_c.append(linha)
+    meta = [{"label": "Fonte", "value": "Linhas de fechamento e placares da ESPN; cálculo de algoritmo.py"},
+            {"label": "Histórico", "value": f"{len(jogos)} jogos, {len(com)} com linha"},
+            {"label": "Gerado em (UTC)", "value": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M")},
+            {"label": "algoritmo.py", "value": pathlib.Path(__file__).read_text(), "type": "code", "lang": "python"}]
+    saida = AQUI / "data"
+    saida.mkdir(exist_ok=True)
+    for nome, rows in (("alg_pernas", linhas), ("alg_combos", combos), ("alg_folga", folga), ("alg_teste", teste_c)):
+        (saida / f"{nome}.json").write_text(json.dumps({"rows": rows, "meta": meta}, ensure_ascii=False))
+        print(f"{nome}: {len(rows)} linhas")
+
+
 if __name__ == "__main__":
+    if len(sys.argv) > 2 and sys.argv[1] == "exportar":
+        exportar(sys.argv[2])
+        sys.exit()
     if len(sys.argv) > 1 and sys.argv[1] == "hoje":
         hoje(sys.argv[2] if len(sys.argv) > 2 else None)
     else:

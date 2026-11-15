@@ -34,6 +34,10 @@
   .np-duo svg { display: block; width: 100%; }
   .np-duo text { fill: var(--np-muted); font-size: 12px; font-family: var(--np-text); }
   .np-duo .np-val { fill: var(--np-fg); font-weight: 700; }
+  .np-cot { width: 84px; font: inherit; color: var(--np-fg); background-color: var(--np-bg); border: 2px solid var(--np-line); border-radius: 8px; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+  .np-combo { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--np-panel); border: 2px solid var(--np-orange); border-radius: 14px; }
+  .np-combo ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+  .np-combo .np-pct { color: var(--np-orange); font-size: 40px; line-height: .9; }
   .np-note { margin: 0; color: var(--np-muted); font-size: 13px; line-height: 1.45; max-width: 75ch; }
   .np-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .np select { font: inherit; color: var(--np-fg); background-color: var(--np-panel); border: 2px solid var(--np-line); border-radius: 10px; padding: 7px 10px; max-width: 100%; }
@@ -133,13 +137,14 @@
     <p class="np-lede" id="resumo">
       O maior favorito do modelo é <b data-draw="top-fav" data-source="resumo_hoje" data-field="favorito" data-row="0">—</b>,
       com <b data-draw="top-prob" data-source="resumo_hoje" data-field="prob" data-row="0">—</b>% de chance de vitória.
-      Na rodada anterior, os palpites acertaram <b data-draw="p-acertos" data-source="resumo_palpites" data-field="acertos" data-row="0">—</b>
+      Até aqui, os palpites de vencedor acertaram <b data-draw="p-acertos" data-source="resumo_palpites" data-field="acertos" data-row="0">—</b>
       de <b data-draw="p-fechados" data-source="resumo_palpites" data-field="fechados" data-row="0">—</b> jogos.
     </p>
   </header>
 
   <div class="np-tabs" role="tablist" aria-label="Seções do painel">
     <button class="np-tab" role="tab" data-tab="hoje" aria-selected="true">Hoje</button>
+    <button class="np-tab" role="tab" data-tab="algoritmo" aria-selected="false">Algoritmo</button>
     <button class="np-tab" role="tab" data-tab="ontem" aria-selected="false">Rodada anterior</button>
     <button class="np-tab" role="tab" data-tab="times" aria-selected="false">Times</button>
     <button class="np-tab" role="tab" data-tab="jogadores" aria-selected="false">Jogadores</button>
@@ -246,6 +251,57 @@
       <h2 class="np-h2" id="hoje-proj">Pontos esperados</h2>
       <p class="np-note">Média de pontos do jogador na temporada, ajustada pelos pontos que o adversário costuma sofrer. Jogadores listados como fora pela ESPN não entram. Toque em um jogador para ver a ficha e os últimos 10 jogos.</p>
       <div class="np-players" data-draw="cards-proj" data-source="projecoes fotos" id="cards-proj"></div>
+    </div>
+  </section>
+
+  <section class="np-sec" id="algoritmo" hidden>
+    <div class="np-block">
+      <h2 class="np-h2" id="alg-combos">Dupla e tripla do dia</h2>
+      <p class="np-note">O algoritmo parte da linha das casas e escolhe linhas alternativas com folga, uma perna por jogo. Digite a cotação que a sua casa paga pela combinação: ela só vale a pena se for maior que a cotação mínima. Acertar muito não é o mesmo que lucrar; no teste com cotações reais, apostar em favoritos não deu lucro consistente.</p>
+      <div class="np-grid" data-draw="alg-combos" data-source="alg_combos" id="cards-combos"></div>
+    </div>
+    <div class="np-block">
+      <h2 class="np-h2" id="alg-pernas">Pernas com cerca de 80% de chance</h2>
+      <p class="np-note">Todas as linhas com folga que o algoritmo encontrou para os jogos de hoje. Jogos sem linha das casas publicada só têm pernas de 1º quarto e 1º tempo, que usam o modelo de médias e são menos confiáveis. Digite a cotação da casa para ver se a perna vale.</p>
+      <div class="np-row">
+        <select id="alg-jogo" data-draw="alg-jogo" aria-label="Jogo" data-source="alg_pernas"></select>
+        <select id="alg-mercado" aria-label="Mercado">
+          <option value="">Todos os mercados</option><option>Vencedor</option><option>Handicap</option><option>Total do jogo</option><option>1º quarto</option><option>1º tempo</option>
+        </select>
+      </div>
+      <div class="np-scroll">
+        <table class="np-table" data-source="alg_pernas" data-row-key="chave" id="tabela-pernas">
+          <thead><tr>
+            <th data-field="aposta">Aposta</th><th class="np-n" data-field="cotacao_minima">Mínima</th>
+            <th>Cotação da casa</th><th>Vale?</th>
+            <th data-field="jogo">Jogo</th><th class="np-n" data-field="chance">Chance %</th><th data-field="mercado">Mercado</th>
+          </tr></thead>
+          <tbody data-draw="alg-linhas"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="np-block">
+      <h2 class="np-h2" id="alg-teste">Como o algoritmo se saiu no histórico</h2>
+      <p class="np-note">Teste em jogos da temporada passada e da atual. A primeira tabela mostra com que frequência uma linha com folga bateu. A segunda mostra em quantos dias a dupla e a tripla escolhidas pelo algoritmo acertaram, e a cotação mínima que elas precisariam pagar para empatar.</p>
+      <div class="np-scroll">
+        <table class="np-table" data-source="alg_folga" data-row-key="chave" id="tabela-folga">
+          <thead><tr>
+            <th class="np-n" data-field="folga">Folga em pontos</th><th class="np-n" data-field="acerto_total">Total bateu %</th>
+            <th class="np-n" data-field="acerto_handicap">Handicap bateu %</th><th class="np-n" data-field="jogos">Jogos</th>
+          </tr></thead>
+          <tbody data-draw="alg-folga"></tbody>
+        </table>
+      </div>
+      <div class="np-scroll">
+        <table class="np-table" data-source="alg_teste" data-row-key="chave" id="tabela-teste">
+          <thead><tr>
+            <th class="np-n" data-field="chance_por_perna">Chance por perna %</th>
+            <th class="np-n" data-field="acerto_dupla">Dupla acertou %</th><th class="np-n" data-field="dias_dupla">Dias</th><th class="np-n" data-field="cotacao_minima_dupla">Cotação mínima</th>
+            <th class="np-n" data-field="acerto_tripla">Tripla acertou %</th><th class="np-n" data-field="dias_tripla">Dias</th><th class="np-n" data-field="cotacao_minima_tripla">Cotação mínima</th>
+          </tr></thead>
+          <tbody data-draw="alg-teste"></tbody>
+        </table>
+      </div>
     </div>
   </section>
 
@@ -564,6 +620,54 @@
       return pcard(id, x.jogador, x.sigla, pill, el('div', 'np-small', hit));
     }));
   });
+
+  // ---------- algoritmo ----------
+  np.cot = {}; np.algJogo = ''; np.algMercado = '';
+  const c2 = (v) => (v == null || v === '' ? '—' : Number(v).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+  const veredito = (node, chave, minima) => {
+    const v = parseFloat(String(np.cot[chave] || '').replace(',', '.'));
+    node.className = 'np-tag ' + (!v ? '' : v > minima ? 'np-up' : 'np-down');
+    node.textContent = !v ? 'Digite a cotação' : v > minima ? 'Vale' : 'Não vale';
+    node.hidden = false;
+  };
+  const campo = (chave, minima, alvo, rotulo) => {
+    const i = el('input', 'np-cot'); i.type = 'text'; i.inputMode = 'decimal'; i.placeholder = 'ex.: 1,45'; i.setAttribute('aria-label', rotulo);
+    i.id = 'cot-' + chave; i.value = np.cot[chave] || '';
+    i.oninput = () => { np.cot[chave] = i.value; veredito(alvo, chave, minima); };
+    return i;
+  };
+  dash.draw('alg-combos', (box) => {
+    const r = rows('alg_combos');
+    if (!r) { wait(box, 'alg_combos'); return; }
+    if (!r.length) { box.replaceChildren(el('span', 'np-small', 'Ainda não há jogos com linha das casas suficientes para montar a dupla e a tripla de hoje.')); return; }
+    box.replaceChildren(...r.map((c) => {
+      const card = el('div', 'np-combo'); const top = el('div', 'np-favrow');
+      top.append(el('div', 'np-lbl np-disp', c.tipo), el('div', 'np-pct np-disp', c.chance + '%'));
+      const ul = el('ul'); String(c.pernas).split(' + ').forEach((t) => ul.append(el('li', '', t)));
+      const tag = el('span', 'np-tag'); const row = el('div', 'np-row');
+      row.append(campo('combo-' + c.chave, c.cotacao_minima, tag, 'Cotação da casa para a ' + c.tipo), tag);
+      card.append(top, el('div', 'np-small', 'chance estimada de acerto · cotação mínima para valer: ' + c2(c.cotacao_minima)), ul, row);
+      veredito(tag, 'combo-' + c.chave, c.cotacao_minima);
+      return card;
+    }));
+  });
+  dash.draw('alg-jogo', (sel) => {
+    const jogosAlg = [...new Map((rows('alg_pernas') || []).map((x) => [x.jogo_id, x.jogo])).entries()];
+    sel.replaceChildren(new Option('Todos os jogos', ''), ...jogosAlg.map(([id, nome]) => new Option(nome, id)));
+    sel.value = np.algJogo;
+    sel.onchange = () => { np.algJogo = sel.value; dash.draw('alg-linhas'); };
+  });
+  document.querySelectorAll('#alg-mercado').forEach((s) => s.addEventListener('change', () => { np.algMercado = s.value; dash.draw('alg-linhas'); }));
+  dash.draw('alg-linhas', (tb) => {
+    const list = (rows('alg_pernas') || []).filter((x) => (!np.algJogo || x.jogo_id === np.algJogo) && (!np.algMercado || x.mercado === np.algMercado)).sort((a, b) => b.chance - a.chance);
+    fill(tb, list, 'chave', [['aposta'], ['cotacao_minima', c2, N], ['jogo'], ['chance', txt, N], ['mercado']], (tr, r) => {
+      const tag = el('span', 'np-tag'), a = el('td'), b = el('td');
+      a.append(campo(r.chave, r.cotacao_minima, tag, 'Cotação da casa para ' + r.aposta)); b.append(tag);
+      tr.children[1].after(a, b); veredito(tag, r.chave, r.cotacao_minima);
+    });
+  });
+  dash.draw('alg-folga', (tb) => fill(tb, rows('alg_folga') || [], 'chave', [['folga', txt, N], ['acerto_total', f1, N], ['acerto_handicap', f1, N], ['jogos', txt, N]]));
+  dash.draw('alg-teste', (tb) => fill(tb, rows('alg_teste') || [], 'chave', [['chance_por_perna', txt, N], ['acerto_dupla', f1, N], ['dias_dupla', txt, N], ['cotacao_minima_dupla', c2, N], ['acerto_tripla', f1, N], ['dias_tripla', txt, N], ['cotacao_minima_tripla', c2, N]]));
 
   // ---------- rodada anterior ----------
   dash.draw('cards-ontem', (box) => {

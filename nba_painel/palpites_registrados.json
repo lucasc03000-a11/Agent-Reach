@@ -95,9 +95,9 @@
   "palpite": "DEN",
   "confianca": "Alta",
   "chave": "2026-11-14 DEN @ NO",
-  "resultado": "",
-  "vencedor": "",
-  "situacao": "Em aberto"
+  "resultado": "DEN 116 x 108 NO",
+  "vencedor": "DEN",
+  "situacao": "Acertou"
  },
  {
   "data": "2026-11-14",
@@ -105,9 +105,9 @@
   "palpite": "DAL",
   "confianca": "Baixa",
   "chave": "2026-11-14 DAL @ CLE",
-  "resultado": "",
-  "vencedor": "",
-  "situacao": "Em aberto"
+  "resultado": "DAL 117 x 127 CLE",
+  "vencedor": "CLE",
+  "situacao": "Errou"
  },
  {
   "data": "2026-11-14",
@@ -115,9 +115,9 @@
   "palpite": "DET",
   "confianca": "Média",
   "chave": "2026-11-14 DET @ MIA",
-  "resultado": "",
-  "vencedor": "",
-  "situacao": "Em aberto"
+  "resultado": "DET 117 x 137 MIA",
+  "vencedor": "MIA",
+  "situacao": "Errou"
  },
  {
   "data": "2026-11-14",
@@ -125,9 +125,9 @@
   "palpite": "MEM",
   "confianca": "Média",
   "chave": "2026-11-14 BKN @ MEM",
-  "resultado": "",
-  "vencedor": "",
-  "situacao": "Em aberto"
+  "resultado": "BKN 110 x 129 MEM",
+  "vencedor": "MEM",
+  "situacao": "Acertou"
  },
  {
   "data": "2026-11-14",
@@ -135,8 +135,8 @@
   "palpite": "MIN",
   "confianca": "Alta",
   "chave": "2026-11-14 CHI @ MIN",
-  "resultado": "",
-  "vencedor": "",
-  "situacao": "Em aberto"
+  "resultado": "CHI 117 x 106 MIN",
+  "vencedor": "CHI",
+  "situacao": "Errou"
  }
 ]
