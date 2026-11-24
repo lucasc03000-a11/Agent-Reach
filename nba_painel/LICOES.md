@@ -22,3 +22,18 @@ Registro completo em `registro_palpites.csv` (61 palpites de 13 a 23/11; 28 cert
 5. **Ao vivo:** em jogo apertado no fim, somar uns 8 a 10 pontos ao ritmo, por causa das faltas.
 6. **Antes de indicar, conferir lesões perto do horário do jogo** (Wembanyama, Fox, Zion, Towns e Anunoby mudaram linhas em cima da hora).
 7. **Registrar cada palpite e o resultado em `registro_palpites.csv`** para medir de novo a cada semana.
+
+## Método de totais (`metodo_totais.py`), testado em 24/11/2026
+
+Teste dia a dia, sem olhar o futuro, em 875 jogos com linha (695 da temporada passada e 180 desta):
+
+| Temporada | Acertos | Erros | % acerto |
+|---|---|---|---|
+| 2025-26 | 370 | 325 | 53,2% |
+| 2026-27 | 98 | 82 | 54,4% |
+| Total | 468 | 407 | 53,5% |
+
+- Para empatar a odd 1,85 é preciso 54,1%; o método fica praticamente no empate.
+- Filtrar só os jogos de "mais confiança" não melhorou de forma consistente (ruído).
+- O que o modelo aprendeu: jogos de times com totais altos nos últimos 5 tendem a voltar para baixo; times em noites seguidas (B2B) puxam para cima; a tendência da liga nos últimos 14 dias continua.
+- A projeção simples pelas médias dos times, sozinha, acertou só 48,7%.
