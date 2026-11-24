@@ -1,0 +1,62 @@
+data,jogo,mercado,palpite,metodo,resultado,observacao
+2026-11-13,MIL @ ORL,vencedor,ORL,favorito pela linha,certo,
+2026-11-13,NY @ IND,vencedor,NY,favorito pela linha,errado,
+2026-11-13,CLE @ MIA,vencedor,CLE,favorito pela linha,errado,
+2026-11-13,ATL @ CHI,vencedor,ATL,favorito pela linha,errado,
+2026-11-13,MEM @ NO,vencedor,NO,medias dos times,errado,
+2026-11-13,UTAH @ HOU,vencedor,HOU,favorito pela linha,certo,
+2026-11-13,GS @ SA,vencedor,SA,favorito pela linha,certo,
+2026-11-13,POR @ SAC,vencedor,SAC,medias dos times,errado,
+2026-11-13,OKC @ LAC,vencedor,OKC,favorito pela linha,errado,
+2026-11-14,DEN @ NO,vencedor,DEN,favorito pela linha,certo,
+2026-11-14,DAL @ CLE,vencedor,DAL,favorito pela linha,errado,
+2026-11-14,DET @ MIA,vencedor,DET,favorito pela linha,errado,
+2026-11-14,BKN @ MEM,vencedor,MEM,favorito pela linha,certo,
+2026-11-14,CHI @ MIN,vencedor,MIN,favorito pela linha,errado,
+2026-11-14,DEN @ NO,total,acima 225.5,tendencia dos times,errado,total 224
+2026-11-14,DET @ MIA,total,acima 224.5,tendencia dos times,certo,
+2026-11-14,BKN @ MEM,total,acima 221.5,tendencia dos times,certo,
+2026-11-14,CHI @ MIN,total,abaixo 240.5,tendencia dos times,certo,
+2026-11-14,DAL @ CLE,total,abaixo 231.5,tendencia dos times,errado,total 244
+2026-11-15,IND @ PHI,1o quarto,PHI abaixo 30.5,medias de 1o quarto,certo,
+2026-11-15,LAL @ PHX,1o quarto,abaixo 60.5,medias de 1o quarto,certo,
+2026-11-15,CHA @ LAC,handicap,LAC +3.5,linha com margem,certo,
+2026-11-15,SA @ UTAH,handicap,SA -12.5,linha com margem,errado,venceu por 8
+2026-11-16,ORL @ BOS,vencedor,BOS,favorito pela linha,errado,
+2026-11-16,PHX @ DEN,vencedor,DEN,favorito pela linha,errado,
+2026-11-16,POR @ MIN,1o quarto,abaixo 60.5,medias de 1o quarto,certo,
+2026-11-16,PHI @ BKN,1o quarto,abaixo 59.5,medias de 1o quarto,certo,
+2026-11-16,PHX @ DEN,1o quarto,abaixo 60.5,medias de 1o quarto,certo,
+2026-11-16,MEM @ WSH,1o quarto,abaixo 60.5,medias de 1o quarto,errado,
+2026-11-21,POR @ NY,total,abaixo 215.5,tendencia dos times,certo,
+2026-11-21,MEM @ MIN,total,abaixo 229.5,tendencia dos times,certo,
+2026-11-21,LAC @ DAL,total,acima 230.5,tendencia dos times,errado,
+2026-11-21,NO @ SA,total,abaixo 228.5,tendencia dos times,certo,
+2026-11-21,NO @ SA,handicap,NO +18.5,linha com margem,errado,perdeu por 23
+2026-11-22,BOS @ GS,total ao vivo,abaixo 213.5,ritmo ao vivo,certo,
+2026-11-22,IND @ NY,total ao vivo,abaixo 219,ritmo ao vivo,errado,
+2026-11-22,DEN @ CHI,total ao vivo,abaixo 260,ritmo ao vivo,errado,total 296
+2026-11-23,MEM @ CHA,vencedor,MEM,favorito pela linha,certo,
+2026-11-23,POR @ PHI,vencedor,PHI,favorito pela linha,errado,
+2026-11-23,OKC @ IND,vencedor,OKC,favorito pela linha,errado,
+2026-11-23,MIL @ TOR,vencedor,TOR,favorito pela linha,errado,
+2026-11-23,BKN @ MIN,vencedor,MIN,favorito pela linha,certo,
+2026-11-23,CLE @ CHI,vencedor,CLE,favorito pela linha,errado,
+2026-11-23,PHX @ NO,vencedor,PHX,favorito pela linha,certo,
+2026-11-23,LAC @ HOU,vencedor,HOU,favorito pela linha,certo,
+2026-11-23,UTAH @ LAL,vencedor,LAL,favorito pela linha,certo,
+2026-11-23,SA @ SAC,vencedor,SA,favorito pela linha,certo,
+2026-11-23,POR @ PHI,total,abaixo 231.5,tendencia dos times,errado,total 239
+2026-11-23,MIL @ TOR,total,abaixo 222.5,tendencia dos times,errado,total 227
+2026-11-23,BKN @ MIN,total,abaixo 222.5,tendencia dos times,errado,total 258
+2026-11-23,PHX @ NO,total,acima 232.5,tendencia dos times,certo,
+2026-11-23,LAC @ HOU,total,acima 223.5,tendencia dos times,errado,total 220
+2026-11-23,SA @ SAC,total,abaixo 224.5,tendencia dos times,errado,total 230
+2026-11-23,SA @ SAC,handicap,SAC +12.5,linha com margem,errado,perdeu por 16
+2026-11-23,BKN @ MIN,jogador,McDaniels acima 4.5 rebotes,frequencia na temporada,certo,15 de 17 antes
+2026-11-23,POR @ PHI,jogador,Edgecombe acima 8.5 reb+ast,frequencia na temporada,certo,13 de 16 antes
+2026-11-23,MEM @ CHA,jogador,Coward acima 25.5 pts+reb+ast,frequencia na temporada,certo,11 de 16 antes
+2026-11-23,LAC @ HOU,jogador,Hachimura acima 4.5 rebotes,frequencia na temporada,errado,10 de 13 antes; minutos oscilavam
+2026-11-23,BKN @ MIN,jogador,Porter Jr. acima 2.5 bolas de 3,frequencia na temporada,errado,10 de 14 antes; defesa forte
+2026-11-23,BKN @ MIN,jogador,McDaniels abaixo 26.5 pts+reb+ast,media perto da linha,errado,fez 50
+2026-11-23,BKN @ MIN,jogador,McDaniels abaixo 5.5 assistencias,frequencia na temporada,errado,2 de 17 antes; fez 6
