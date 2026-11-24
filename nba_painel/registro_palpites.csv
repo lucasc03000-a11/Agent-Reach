@@ -60,3 +60,9 @@ data,jogo,mercado,palpite,metodo,resultado,observacao
 2026-11-23,BKN @ MIN,jogador,Porter Jr. acima 2.5 bolas de 3,frequencia na temporada,errado,10 de 14 antes; defesa forte
 2026-11-23,BKN @ MIN,jogador,McDaniels abaixo 26.5 pts+reb+ast,media perto da linha,errado,fez 50
 2026-11-23,BKN @ MIN,jogador,McDaniels abaixo 5.5 assistencias,frequencia na temporada,errado,2 de 17 antes; fez 6
+2026-11-24,DAL @ DEN,total,abaixo 234.5,metodo_totais,pendente,odd 1.88; modelo 55%
+2026-11-24,DET @ ORL,total,abaixo 212.5,metodo_totais,pendente,odd 1.89; modelo 54%
+2026-11-24,DET @ ORL,jogador,Huerter abaixo 1.5 roubos,frequencia na temporada,pendente,odd 1.43; 15 de 16
+2026-11-24,DET @ ORL,jogador,Cunningham abaixo 5.5 rebotes,frequencia na temporada,pendente,odd 1.75; 12 de 15; Cade em duvida
+2026-11-24,BOS @ WSH,jogador,Anthony Davis abaixo 1.5 roubos,frequencia na temporada,pendente,odd 1.39; 13 de 16
+2026-11-24,DET @ ORL,jogador,Anthony Black acima 4.5 assistencias,frequencia na temporada,pendente,odd 1.90; 10 de 13
