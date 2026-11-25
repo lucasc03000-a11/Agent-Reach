@@ -60,9 +60,23 @@ data,jogo,mercado,palpite,metodo,resultado,observacao
 2026-11-23,BKN @ MIN,jogador,Porter Jr. acima 2.5 bolas de 3,frequencia na temporada,errado,10 de 14 antes; defesa forte
 2026-11-23,BKN @ MIN,jogador,McDaniels abaixo 26.5 pts+reb+ast,media perto da linha,errado,fez 50
 2026-11-23,BKN @ MIN,jogador,McDaniels abaixo 5.5 assistencias,frequencia na temporada,errado,2 de 17 antes; fez 6
-2026-11-24,DAL @ DEN,total,abaixo 234.5,metodo_totais,pendente,odd 1.88; modelo 55%
-2026-11-24,DET @ ORL,total,abaixo 212.5,metodo_totais,pendente,odd 1.89; modelo 54%
-2026-11-24,DET @ ORL,jogador,Huerter abaixo 1.5 roubos,frequencia na temporada,pendente,odd 1.43; 15 de 16
-2026-11-24,DET @ ORL,jogador,Cunningham abaixo 5.5 rebotes,frequencia na temporada,pendente,odd 1.75; 12 de 15; Cade em duvida
-2026-11-24,BOS @ WSH,jogador,Anthony Davis abaixo 1.5 roubos,frequencia na temporada,pendente,odd 1.39; 13 de 16
-2026-11-24,DET @ ORL,jogador,Anthony Black acima 4.5 assistencias,frequencia na temporada,pendente,odd 1.90; 10 de 13
+2026-11-24,DET @ ORL,total,abaixo 212.5,metodo_totais,certo,total 190
+2026-11-24,DAL @ DEN,total,abaixo 234.5,metodo_totais,certo,total 221
+2026-11-24,DET @ ORL,total,abaixo 220.5 (bet builder),linha com margem,certo,total 190
+2026-11-24,DET @ ORL,1o quarto,abaixo 54.5,medias de 1o quarto,certo,38
+2026-11-24,BOS @ WSH,1o quarto,abaixo 56.5,medias de 1o quarto,errado,62
+2026-11-24,BOS @ WSH,1o tempo,abaixo 112.5,medias de 1o quarto,errado,129
+2026-11-24,BOS @ WSH,total,abaixo 226.5 (bet builder),linha com margem,errado,total 247
+2026-11-24,DET @ ORL,vencedor,DET,favorito pela linha,certo,104 x 86
+2026-11-24,DET @ ORL,handicap,DET +7.5,linha com margem,certo,
+2026-11-24,BOS @ WSH,vencedor,BOS,favorito pela linha,certo,131 x 116
+2026-11-24,DET @ ORL,jogador,Huerter abaixo 1.5 roubos,frequencia na temporada,certo,1 roubo
+2026-11-24,DET @ ORL,jogador,Jenkins acima 3.5 rebotes,frequencia na temporada,certo,4
+2026-11-24,DET @ ORL,jogador,Anthony Black acima 4.5 assistencias,frequencia na temporada,errado,2
+2026-11-24,DET @ ORL,jogador,Cunningham abaixo 5.5 rebotes,frequencia na temporada,anulada,nao jogou
+2026-11-24,BOS @ WSH,jogador,Anthony Davis abaixo 1.5 roubos,frequencia na temporada,errado,2 roubos
+2026-11-24,BOS @ WSH,jogador,Anthony Davis acima 21.5 pontos,frequencia na temporada,certo,33
+2026-11-24,BOS @ WSH,jogador,Hauser acima 6.5 pontos,frequencia na temporada,errado,4
+2026-11-24,BOS @ WSH,jogador,Hauser acima 2.5 bolas de 3,frequencia na temporada,errado,1
+2026-11-24,DAL @ DEN,jogador,Aaron Gordon abaixo 1.5 bolas de 3,frequencia na temporada,certo,0
+2026-11-24,DAL @ DEN,jogador,Aaron Gordon abaixo 2.5 assistencias,frequencia na temporada,errado,3
