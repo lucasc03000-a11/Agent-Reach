@@ -80,11 +80,14 @@ data,jogo,mercado,palpite,metodo,resultado,observacao
 2026-11-24,BOS @ WSH,jogador,Hauser acima 2.5 bolas de 3,frequencia na temporada,errado,1
 2026-11-24,DAL @ DEN,jogador,Aaron Gordon abaixo 1.5 bolas de 3,frequencia na temporada,certo,0
 2026-11-24,DAL @ DEN,jogador,Aaron Gordon abaixo 2.5 assistencias,frequencia na temporada,errado,3
-2026-11-25,BKN @ MIL,total,abaixo 232.5,metodo_totais,pendente,odd 1.93; modelo 59% abaixo
-2026-11-25,CLE @ NY,total,abaixo 218.5,metodo_totais,pendente,odd 1.94; modelo 56% abaixo
-2026-11-25,CHI @ CHA,total,abaixo 221.5,metodo_totais,pendente,odd 1.87; modelo 57% abaixo
-2026-11-25,SAC @ GS,jogador,Draymond Green abaixo 6.5 pontos,frequencia na temporada,pendente,odd 1.75; 12 de 14
-2026-11-25,CHI @ CHA,jogador,Coby White abaixo 2.5 bolas de 3,frequencia na temporada,pendente,odd 1.59; 8 de 9
-2026-11-25,CHI @ CHA,jogador,Buddy Hield abaixo 1.5 roubos,frequencia na temporada,pendente,odd 1.40; 13 de 15
-2026-11-25,LAC @ MEM,jogador,Derrick Jones Jr. abaixo 1.5 assistencias,frequencia na temporada,pendente,odd 1.47; 12 de 15
-2026-11-25,MIA @ PHI,jogador,Bam Adebayo abaixo 1.5 bolas de 3,frequencia na temporada,pendente,odd 1.42; 13 de 16
+2026-11-25,BKN @ MIL,total,abaixo 232.5,metodo_totais,certo,odd 1.93; modelo 59% abaixo; total 201
+2026-11-25,CLE @ NY,total,abaixo 218.5,metodo_totais,errado,odd 1.94; modelo 56% abaixo; total 223
+2026-11-25,CHI @ CHA,total,abaixo 221.5,metodo_totais,certo,odd 1.87; modelo 57% abaixo; total 212
+2026-11-25,SAC @ GS,jogador,Draymond Green abaixo 6.5 pontos,frequencia na temporada,certo,odd 1.75; 12 de 14; 6
+2026-11-25,CHI @ CHA,jogador,Coby White abaixo 2.5 bolas de 3,frequencia na temporada,certo,odd 1.59; 8 de 9; 0
+2026-11-25,CHI @ CHA,jogador,Buddy Hield abaixo 1.5 roubos,frequencia na temporada,certo,odd 1.40; 13 de 15; 1
+2026-11-25,LAC @ MEM,jogador,Derrick Jones Jr. abaixo 1.5 assistencias,frequencia na temporada,certo,odd 1.47; 12 de 15; 1
+2026-11-25,MIA @ PHI,jogador,Bam Adebayo abaixo 1.5 bolas de 3,frequencia na temporada,certo,odd 1.42; 13 de 16; 1
+2026-11-25,PHX @ HOU,total,abaixo 224.5,metodo_totais,certo,total 220; opcional
+2026-11-25,MIN @ OKC,total,abaixo 222.5,metodo_totais,certo,total 219; opcional
+2026-11-25,LAC @ MEM,jogador,Kris Murray abaixo 5.5 pontos,frequencia na temporada,errado,8 pontos em 32 min
