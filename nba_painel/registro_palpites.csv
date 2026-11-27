@@ -91,3 +91,13 @@ data,jogo,mercado,palpite,metodo,resultado,observacao
 2026-11-25,PHX @ HOU,total,abaixo 224.5,metodo_totais,certo,total 220; opcional
 2026-11-25,MIN @ OKC,total,abaixo 222.5,metodo_totais,certo,total 219; opcional
 2026-11-25,LAC @ MEM,jogador,Kris Murray abaixo 5.5 pontos,frequencia na temporada,errado,8 pontos em 32 min
+2026-11-27,PHI @ IND,total,abaixo 229.5,metodo_totais,pendente,odd 1.92; modelo 60% abaixo; Embiid em duvida
+2026-11-27,MIA @ NY,total,abaixo 221.5,metodo_totais,pendente,odd 1.91; modelo 55%
+2026-11-27,MIL @ DET,total,abaixo 219.5,metodo_totais,pendente,odd 1.90; modelo 54%
+2026-11-27,ATL @ BOS,jogador,Tatum abaixo 1.5 roubos,frequencia na temporada,pendente,odd 1.42; 14 de 16
+2026-11-27,ATL @ BOS,jogador,Tatum abaixo 8.5 rebotes,frequencia na temporada,pendente,odd 1.69; 13 de 16
+2026-11-27,ATL @ BOS,jogador,Dyson Daniels abaixo 0.5 bolas de 3,frequencia na temporada,pendente,odd 1.41; 14 de 17
+2026-11-27,ATL @ BOS,jogador,Okongwu abaixo 2.5 bolas de 3,frequencia na temporada,pendente,odd 1.53; 14 de 17
+2026-11-27,MIA @ NY,jogador,Bam Adebayo abaixo 1.5 bolas de 3,frequencia na temporada,pendente,odd 1.44; 14 de 17
+2026-11-27,MIA @ NY,jogador,Josh Hart abaixo 9.5 rebotes,frequencia na temporada,pendente,odd 1.96; 13 de 15
+2026-11-27,DEN @ UTAH,jogador,DeRozan abaixo 0.5 bolas de 3,frequencia na temporada,pendente,odd 1.29; 13 de 15
