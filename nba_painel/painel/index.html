@@ -126,6 +126,8 @@
   .np-table .np-n { text-align: right; }
   .np-table tr.np-click { cursor: pointer; }
   .np-table tr.np-click td:first-child { text-decoration: underline; text-decoration-color: var(--np-orange); text-underline-offset: 3px; }
+  .np-busca { font: inherit; font-size: 16px; color: var(--np-fg); background-color: var(--np-panel); border: 2px solid var(--np-line); border-radius: 12px; padding: 10px 14px; width: 100%; max-width: 520px; box-sizing: border-box; }
+  .np-busca:focus { outline: 2px solid var(--np-orange); outline-offset: 2px; }
   .np-cmp { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px 12px; align-items: center; font-variant-numeric: tabular-nums; min-height: 160px; padding: 14px; background: var(--np-panel); border: 2px solid var(--np-line); border-radius: 14px; }
   .np-cmp .np-l { display: flex; justify-content: flex-end; align-items: center; gap: 8px; text-align: right; }
   .np-cmp .np-r { display: flex; align-items: center; gap: 8px; }
@@ -364,6 +366,12 @@
   </section>
 
   <section class="np-sec" id="jogadores" hidden>
+    <div class="np-block">
+      <h2 class="np-h2" id="jog-busca">Buscar jogador</h2>
+      <input class="np-busca" id="busca-jogador" type="search" autocomplete="off" placeholder="Digite o nome do jogador (ex.: Jokic, Tatum)" aria-label="Buscar jogador">
+      <p class="np-note">Toque no jogador para abrir a ficha com as médias da temporada e os últimos 10 jogos.</p>
+      <div class="np-players" data-draw="busca-res" data-source="jogadores fotos" id="busca-res"></div>
+    </div>
     <div class="np-block">
       <h2 class="np-h2" id="jog-comparar">Comparar dois jogadores</h2>
       <div class="np-row">
@@ -755,6 +763,21 @@
   });
 
   // ---------- jogadores ----------
+  np.busca = '';
+  const semAcento = (t) => String(t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  document.querySelectorAll('#busca-jogador').forEach((i) => i.addEventListener('input', () => { np.busca = i.value; dash.draw('busca-res'); }));
+  dash.draw('busca-res', (box) => {
+    const todos = rows('jogadores');
+    if (!todos) { wait(box, 'jogadores'); return; }
+    const q = semAcento(np.busca.trim());
+    if (q.length < 2) { box.replaceChildren(el('span', 'np-small', 'Digite pelo menos 2 letras do nome.')); return; }
+    const achados = todos.filter((j) => semAcento(j.jogador).includes(q) || semAcento(j.sigla) === q).sort((a, b) => b.pts - a.pts).slice(0, 12);
+    if (!achados.length) { box.replaceChildren(el('span', 'np-small', 'Nenhum jogador encontrado com esse nome.')); return; }
+    box.replaceChildren(...achados.map((j) => {
+      const pill = el('div', 'np-pill'); pill.append(el('b', '', f1(j.pts)), document.createTextNode(' pts'));
+      return pcard(j.jogador_id, j.jogador, j.sigla, pill, el('div', 'np-small', f1(j.reb) + ' reb · ' + f1(j.ast) + ' ast · ' + j.jogos + ' jogos'));
+    }));
+  });
   const qualif = () => (rows('jogadores') || []).filter((j) => j.jogos >= 3);
   document.querySelectorAll('#filtro-stat').forEach((s) => s.addEventListener('change', () => { np.stat = s.value; dash.draw('linhas-jog'); }));
   dash.draw('filtro-time', (sel) => {

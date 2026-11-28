@@ -345,14 +345,14 @@ def coletar(ontem, hoje):
     # jogadores com ficha completa: os de hoje, os cestinhas de ontem e os 100 maiores pontuadores
     ids = [p["chave"].split("-")[1] for p in projecoes]
     ids += [b["chave"].split("-")[1] for b in sorted(boxscore, key=lambda b: -b["pts"])[:20]]
-    ids += [a["jogador_id"] for a in sorted(atletas, key=lambda a: -a["pts"]) if a["jogos"] >= 3][:100]
+    ids += [a["jogador_id"] for a in sorted(atletas, key=lambda a: -a["pts"]) if a["jogos"] >= 3]   # todos, para a busca do painel
     ids = [i for i in dict.fromkeys(ids) if i in media]
-    ultimos10, fotos = [], []
-    for i in ids:
-        ultimos10 += ultimos_jogos(media[i])
-        foto = miniatura(FOTO.format(i), 200)
-        if foto:
-            fotos.append({"chave": i, "foto": foto})
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(8) as ex:
+        logs = list(ex.map(lambda i: ultimos_jogos(media[i]), ids))
+        fts = list(ex.map(lambda i: miniatura(FOTO.format(i), 160), ids))
+    ultimos10 = [linha for lg in logs for linha in lg]
+    fotos = [{"chave": i, "foto": f} for i, f in zip(ids, fts) if f]
     for t in times.values():
         logo = miniatura(t.pop("logo_url"), 72) if t.get("logo_url") else ""
         if logo:
