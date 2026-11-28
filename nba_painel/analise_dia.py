@@ -7,8 +7,10 @@ Uso:  python3 analise_dia.py PASTA_DAS_ODDS AAAAMMDD
 PASTA_DAS_ODDS tem, para cada jogo, main_<slug>.txt e players_<slug>.txt (texto da
 página do site, salvo por odds_site.js). Regras aplicadas (ver LICOES.md):
   - totais: só o lado indicado pelo método de totais;
+  - totais: só na linha principal e quando o método passa de 54% para um lado;
+  - lado favorito: vencedor ou handicap a favor do favorito (odd 1,30+), o de melhor valor;
   - jogadores: só quando o lado bateu em 80%+ dos jogos da temporada e em 8+ dos
-    últimos 10, com 28+ minutos nos últimos 5 jogos (ou "abaixo").
+    últimos 10, com 28+ minutos nos últimos 5 jogos e odd 1,60+.
 """
 import glob
 import json
@@ -67,6 +69,19 @@ def vencedor(L):
     return nums[0], nums[1]   # (mandante, visitante) — o site lista o mandante primeiro
 
 
+def handicaps(L):
+    """Escada de handicap do jogo: [(lado '1' mandante / '2' visitante, linha, odd)]."""
+    i = L.index("Handicap", L.index("Vencedor (incl. prolongamento)")) if "Handicap" in L else -1
+    out = []
+    for k in range(i + 1, min(i + 120, len(L))):
+        m = re.match(r"^([12])\(([-+]?[\d.]+)\)$", L[k])
+        if m and re.match(r"^\d+\.\d+$", L[k - 1]):
+            out.append((m.group(1), float(m.group(2)), float(L[k - 1])))
+        elif out and not re.match(r"^[\d.]+$", L[k]) and not re.match(r"^[12]\(", L[k]):
+            break
+    return out
+
+
 def props(L):
     out, cur, i = [], None, 0
     while i < len(L):
@@ -115,16 +130,27 @@ def main(pasta, dia):
         print(f"\n=== {v} @ {h} | ESPN: {h} {g['S']:+} · total {T} | lesões: {g['les']}")
         ml = vencedor(L); pm = 1 - P(-mu / sdM)
         print(f"  vencedor: {h} {ml[0]} (chance {pm:.0%}, ev {(pm * ml[0] - 1) * 100:+.0f}%) | {v} {ml[1]} (chance {1 - pm:.0%}, ev {((1 - pm) * ml[1] - 1) * 100:+.0f}%)")
+        # lado favorito: vencedor ou handicap a favor dele (mais chance), escolhendo o de melhor valor com odd >= 1.30
+        fav, pf, oddf = (h, pm, ml[0]) if pm >= 0.5 else (v, 1 - pm, ml[1])
+        opcoes = [(f"{fav} vence", pf, oddf)]
+        for lado_h, x, odd in handicaps(L):
+            time = h if lado_h == "1" else v
+            margem = mu if lado_h == "1" else -mu          # margem esperada do time
+            pr = 1 - P((-x - margem) / sdM)                # time + x > 0
+            if time == fav and odd >= 1.30 and pr > pf:   # só linhas que aumentam a chance do favorito
+                opcoes.append((f"{time} {x:+.1f}", pr, odd))
+        melhor_v = max(opcoes, key=lambda o: o[1] * o[2])
+        print(f"  lado favorito: melhor = {melhor_v[0]} a {melhor_v[2]} (chance {melhor_v[1]:.0%}, ev {(melhor_v[1] * melhor_v[2] - 1) * 100:+.0f}%)")
+        resumo.append(("vencedor", f"{v} @ {h}", melhor_v[0], melhor_v[2], melhor_v[1]))
         pa = p_acima.get(h, 0.5); lado = "acima" if pa > 0.5 else "abaixo"
         melhor = None
-        for lin, oa, ob in escada_total(L):
-            # chance pelo método: desloca a média da ESPN conforme a inclinação do modelo
+        escada = escada_total(L)
+        if escada:   # só a linha principal (odds mais parecidas dos dois lados): foi onde o método foi testado
+            lin, oa, ob = min(escada, key=lambda t: abs(t[1] - t[2]))
             media = T + NormalDist().inv_cdf(pa) * sdT
             pr = (1 - P((lin - media) / sdT)) if lado == "acima" else P((lin - media) / sdT)
-            odd = oa if lado == "acima" else ob
-            if melhor is None or pr * odd > melhor[1] * melhor[2]:
-                melhor = (lin, pr, odd)
-        if melhor:
+            melhor = (lin, pr, oa if lado == "acima" else ob)
+        if melhor and max(pa, 1 - pa) >= 0.54:
             print(f"  total (método {pa:.0%} acima): melhor = {lado} de {melhor[0]} a {melhor[2]} (chance {melhor[1]:.0%}, ev {(melhor[1] * melhor[2] - 1) * 100:+.0f}%)")
             resumo.append(("total", f"{v} @ {h}", f"{lado} de {melhor[0]}", melhor[2], melhor[1]))
         pp = os.path.join(pasta, f"players_{slug}.txt")
@@ -155,7 +181,7 @@ def main(pasta, dia):
             for lado_p, odd in (("acima", oa), ("abaixo", ob)):
                 ok = [(x > lin) if lado_p == "acima" else (x < lin) for x in vals]
                 ps, r10 = sum(ok) / len(ok), sum(ok[-10:])
-                if ps >= 0.8 and r10 >= 8 and (lado_p == "abaixo" or minutos >= 28):
+                if ps >= 0.8 and r10 >= 8 and minutos >= 28 and odd >= 1.60:
                     pr = 0.6 * ps + 0.4 * (1 / odd) / 1.05
                     print(f"  JOGADOR: {nome} {lado_p} de {lin} {NOMES[m]} a {odd} | temporada {sum(ok)}/{len(ok)}, últimos 10 {r10}/10, média {st.mean(vals):.1f}, {minutos:.0f} min")
                     resumo.append(("jogador", f"{v} @ {h}", f"{nome} {lado_p} de {lin} {NOMES[m]}", odd, pr))

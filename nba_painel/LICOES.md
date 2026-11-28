@@ -37,3 +37,19 @@ Teste dia a dia, sem olhar o futuro, em 875 jogos com linha (695 da temporada pa
 - Filtrar só os jogos de "mais confiança" não melhorou de forma consistente (ruído).
 - O que o modelo aprendeu: jogos de times com totais altos nos últimos 5 tendem a voltar para baixo; times em noites seguidas (B2B) puxam para cima; a tendência da liga nos últimos 14 dias continua.
 - A projeção simples pelas médias dos times, sozinha, acertou só 48,7%.
+
+## Placar por tipo de aposta (24 a 27/11, R$ 100 cada, odds do VelvetSpin)
+
+| Tipo | Apostas | Acertos | Resultado |
+|---|---|---|---|
+| Totais pelo método (linha principal) | 10 | 9 | +R$ 709 |
+| Lado favorito indicado | 5 | 5 | +R$ 191 |
+| Jogadores pela regra de 80% | 14 | 9 | ≈ R$ 0 |
+| Jogadores fora da regra | 7 | 3 | −R$ 201 |
+| 1º quarto / 1º tempo | 3 | 1 | −R$ 115 |
+
+Regras novas (aplicadas em `analise_dia.py`, rodado por `rodar_dia.sh AAAAMMDD PASTA`):
+- Totais: só na linha principal e só quando o método passa de 54% para um lado.
+- Lado favorito: vencedor ou handicap que aumenta a chance do favorito, com odd 1,30+, o de melhor valor.
+- Jogadores: 80%+ na temporada, 8+ nos últimos 10, 28+ minutos nos últimos 5 jogos e odd 1,60+ (corta os "abaixo de 1,5 roubos" a 1,40, que um único lance derruba).
+- Preferir apostas simples a múltiplas grandes.
